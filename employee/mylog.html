@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — سجل عملياتي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="employee-layout">
+
+  <header class="emp-topbar">
+    <a href="home.html" style="color:rgba(255,255,255,0.8);text-decoration:none;font-size:20px">←</a>
+    <div class="emp-topbar-logo">📋 سجل عملياتي</div>
+    <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8)" data-logout>خروج</button>
+  </header>
+
+  <div class="emp-content">
+
+    <!-- Stats -->
+    <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:20px">
+      <div class="stat-card" style="flex-direction:column;text-align:center;padding:16px 10px">
+        <div style="font-size:28px;font-weight:900;color:var(--primary)" id="totalOps">—</div>
+        <div style="font-size:12px;color:var(--gray-600);font-weight:600;margin-top:4px">إجمالي</div>
+      </div>
+      <div class="stat-card" style="flex-direction:column;text-align:center;padding:16px 10px">
+        <div style="font-size:28px;font-weight:900;color:var(--warning)" id="activeOps">—</div>
+        <div style="font-size:12px;color:var(--gray-600);font-weight:600;margin-top:4px">مؤجَّرة</div>
+      </div>
+      <div class="stat-card" style="flex-direction:column;text-align:center;padding:16px 10px">
+        <div style="font-size:28px;font-weight:900;color:var(--success)" id="returnedOps">—</div>
+        <div style="font-size:12px;color:var(--gray-600);font-weight:600;margin-top:4px">مُعادة</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar" style="padding:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">من تاريخ</label>
+          <input type="date" id="fFrom" class="form-control" onchange="applyFilters()">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">إلى تاريخ</label>
+          <input type="date" id="fTo" class="form-control" onchange="applyFilters()">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" id="filterAll"
+          style="flex:1;border:2px solid var(--accent);background:rgba(201,168,76,0.1);color:var(--accent-dark);font-weight:700"
+          onclick="setStatusFilter('الكل')">الكل</button>
+        <button class="btn btn-outline btn-sm" id="filterRented"
+          style="flex:1" onclick="setStatusFilter('مؤجَّرة')">🔒 مؤجَّرة</button>
+        <button class="btn btn-outline btn-sm" id="filterReturned"
+          style="flex:1" onclick="setStatusFilter('مُعادة')">✅ مُعادة</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 عملياتي</div>
+        <span id="opsCount" class="badge badge-primary">0 عملية</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>كود العملية</th>
+              <th>كود البدلة</th>
+              <th>المستأجر</th>
+              <th>تاريخ الخروج</th>
+              <th>تاريخ العودة</th>
+              <th>السعر</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="myLogBody">
+            <tr><td colspan="7" class="text-center text-muted" style="padding:32px">جاري التحميل...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="emp-bottom-nav">
+    <a href="home.html" class="bottom-nav-item"><span class="nav-icon">🏠</span>الرئيسية</a>
+    <a href="rent.html" class="bottom-nav-item"><span class="nav-icon">🤵</span>تأجير</a>
+    <a href="return.html" class="bottom-nav-item"><span class="nav-icon">📦</span>استلام</a>
+    <a href="mylog.html" class="bottom-nav-item active"><span class="nav-icon">📋</span>سجلي</a>
+  </nav>
+
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+
+let allMyRentals = [];
+let currentStatusFilter = 'الكل';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireEmployee()) return;
+
+  const user = Auth.getCurrentUser();
+  try {
+    allMyRentals = await getRentalsByEmployee(user.username);
+    allMyRentals.sort((a,b) => b.checkout_date.localeCompare(a.checkout_date));
+
+    document.getElementById('totalOps').textContent = allMyRentals.length;
+    document.getElementById('activeOps').textContent = allMyRentals.filter(r => r.status === 'مؤجَّرة').length;
+    document.getElementById('returnedOps').textContent = allMyRentals.filter(r => r.status === 'مُعادة').length;
+
+    applyFilters();
+  } catch (err) {
+    document.getElementById('myLogBody').innerHTML =
+      `<tr><td colspan="7" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل البيانات</td></tr>`;
+  }
+});
+
+function setStatusFilter(status) {
+  currentStatusFilter = status;
+
+  const all = document.getElementById('filterAll');
+  const rented = document.getElementById('filterRented');
+  const returned = document.getElementById('filterReturned');
+
+  const activeStyle = 'flex:1;border:2px solid var(--accent);background:rgba(201,168,76,0.1);color:var(--accent-dark);font-weight:700';
+  const inactiveStyle = 'flex:1';
+
+  all.style.cssText = status === 'الكل' ? activeStyle : inactiveStyle;
+  all.className = status === 'الكل' ? 'btn btn-sm' : 'btn btn-outline btn-sm';
+
+  rented.style.cssText = status === 'مؤجَّرة' ? activeStyle : inactiveStyle;
+  rented.className = status === 'مؤجَّرة' ? 'btn btn-sm' : 'btn btn-outline btn-sm';
+
+  returned.style.cssText = status === 'مُعادة' ? activeStyle : inactiveStyle;
+  returned.className = status === 'مُعادة' ? 'btn btn-sm' : 'btn btn-outline btn-sm';
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const from = document.getElementById('fFrom').value;
+  const to = document.getElementById('fTo').value;
+
+  let filtered = allMyRentals.filter(r => {
+    if (currentStatusFilter !== 'الكل' && r.status !== currentStatusFilter) return false;
+    if (from && r.checkout_date < from) return false;
+    if (to && r.checkout_date > to) return false;
+    return true;
+  });
+
+  renderTable(filtered);
+}
+
+function renderTable(rentals) {
+  document.getElementById('opsCount').textContent = `${rentals.length} عملية`;
+  const tbody = document.getElementById('myLogBody');
+
+  if (!rentals.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:40px;text-align:center">
+      <div class="empty-state-icon">📋</div>
+      <div class="empty-state-text">لا توجد عمليات</div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rentals.map(r => `
+    <tr>
+      <td data-label="كود العملية"><strong>${r.rental_id}</strong></td>
+      <td data-label="كود البدلة">${r.suit_id}</td>
+      <td data-label="المستأجر">${r.tenant_name}</td>
+      <td data-label="تاريخ الخروج">${r.checkout_date}</td>
+      <td data-label="تاريخ العودة">${r.expected_return}</td>
+      <td data-label="السعر">${Number(r.rental_price||0).toLocaleString('ar-EG')} ج</td>
+      <td data-label="الحالة">
+        ${r.status === 'مؤجَّرة'
+          ? '<span class="badge badge-warning">🔒 مؤجَّرة</span>'
+          : '<span class="badge badge-success">✅ مُعادة</span>'}
+      </td>
+    </tr>
+  `).join('');
+}
+</script>
+</body>
+</html>

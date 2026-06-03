@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — تسجيل استلام عودة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="employee-layout">
+
+  <header class="emp-topbar">
+    <a href="home.html" style="color:rgba(255,255,255,0.8);text-decoration:none;font-size:20px">←</a>
+    <div class="emp-topbar-logo">📦 تسجيل استلام عودة</div>
+    <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8)" data-logout>خروج</button>
+  </header>
+
+  <div class="emp-content">
+
+    <!-- القسم 1: البحث -->
+    <div class="section-card">
+      <div class="section-card-header"><span>1️⃣</span> البحث عن العملية</div>
+      <div class="section-card-body">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <button class="btn" id="btnSearchBySuit"
+            style="border:2px solid var(--accent);background:rgba(201,168,76,0.1);color:var(--accent-dark);font-weight:700"
+            onclick="setSearchMode('suit')">
+            🔍 بكود البدلة
+          </button>
+          <button class="btn btn-outline" id="btnSearchByTenant"
+            onclick="setSearchMode('tenant')">
+            👤 باسم / موبايل المستأجر
+          </button>
+        </div>
+
+        <!-- البحث بكود البدلة -->
+        <div id="searchBySuit">
+          <div class="search-box">
+            <input type="text" id="searchSuitCode" class="form-control"
+              placeholder="مثال: S-001"
+              style="font-size:16px;font-weight:600;letter-spacing:1px">
+            <button class="btn btn-primary" onclick="searchByCode()">🔍 بحث</button>
+          </div>
+        </div>
+
+        <!-- البحث باسم/موبايل -->
+        <div id="searchByTenant" style="display:none">
+          <div class="search-box">
+            <input type="text" id="searchTenantQuery" class="form-control"
+              placeholder="اسم المستأجر أو رقم الموبايل">
+            <button class="btn btn-primary" onclick="searchByTenant()">🔍 بحث</button>
+          </div>
+        </div>
+
+        <!-- نتائج البحث -->
+        <div id="searchResultsDiv" style="margin-top:16px;display:none">
+          <div id="multiResults"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- بيانات العملية -->
+    <div id="rentalInfoSection" style="display:none">
+      <div class="section-card">
+        <div class="section-card-header"><span>📋</span> بيانات العملية</div>
+        <div class="section-card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div><div class="detail-label">كود العملية</div><div class="detail-value" id="dRentalId">—</div></div>
+            <div><div class="detail-label">كود البدلة</div><div class="detail-value" id="dSuitId">—</div></div>
+            <div><div class="detail-label">نوع البدلة</div><div class="detail-value" id="dSuitType">—</div></div>
+            <div><div class="detail-label">اللون / المقاس</div><div class="detail-value" id="dSuitDetails">—</div></div>
+            <div><div class="detail-label">المستأجر</div><div class="detail-value" id="dTenantName">—</div></div>
+            <div><div class="detail-label">رقم الموبايل</div><div class="detail-value" id="dTenantPhone">—</div></div>
+            <div><div class="detail-label">تاريخ الخروج</div><div class="detail-value" id="dCheckout">—</div></div>
+            <div><div class="detail-label">العودة المتوقعة</div><div class="detail-value" id="dExpReturn">—</div></div>
+            <div><div class="detail-label">مبلغ التأمين</div><div class="detail-value" id="dDeposit">—</div></div>
+            <div><div class="detail-label">الموظف المؤجِّر</div><div class="detail-value" id="dRentedBy">—</div></div>
+          </div>
+          <div id="lateWarning" style="margin-top:12px;display:none"></div>
+        </div>
+      </div>
+
+      <!-- القسم 2: تأكيد الاستلام -->
+      <div class="section-card">
+        <div class="section-card-header"><span>2️⃣</span> تأكيد الاستلام</div>
+        <div class="section-card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">تاريخ الاستلام الفعلي <span class="required">*</span></label>
+              <input type="date" id="actualReturn" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">هل تم رد التأمين؟</label>
+              <div class="toggle-group" style="margin-top:8px">
+                <label class="toggle">
+                  <input type="checkbox" id="depositReturned">
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label" id="depositToggleLabel">لا</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ملاحظات (اختياري)</label>
+            <textarea id="returnNotes" class="form-control" rows="2" placeholder="حالة البدلة عند الاستلام..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- زر التأكيد -->
+      <div style="margin-bottom:80px">
+        <button class="btn btn-success btn-lg" style="width:100%" id="confirmReturnBtn" onclick="confirmReturn()">
+          ✅ تأكيد الاستلام
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="emp-bottom-nav">
+    <a href="home.html" class="bottom-nav-item"><span class="nav-icon">🏠</span>الرئيسية</a>
+    <a href="rent.html" class="bottom-nav-item"><span class="nav-icon">🤵</span>تأجير</a>
+    <a href="return.html" class="bottom-nav-item active"><span class="nav-icon">📦</span>استلام</a>
+    <a href="mylog.html" class="bottom-nav-item"><span class="nav-icon">📋</span>سجلي</a>
+  </nav>
+
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+
+let selectedRental = null;
+let searchMode = 'suit';
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!Auth.requireEmployee()) return;
+
+  document.getElementById('actualReturn').value = today();
+
+  // toggle label للتأمين
+  document.getElementById('depositReturned').addEventListener('change', function() {
+    document.getElementById('depositToggleLabel').textContent = this.checked ? 'نعم' : 'لا';
+  });
+});
+
+function setSearchMode(mode) {
+  searchMode = mode;
+  document.getElementById('searchBySuit').style.display = mode === 'suit' ? 'block' : 'none';
+  document.getElementById('searchByTenant').style.display = mode === 'tenant' ? 'block' : 'none';
+
+  const suitBtn = document.getElementById('btnSearchBySuit');
+  const tenantBtn = document.getElementById('btnSearchByTenant');
+
+  if (mode === 'suit') {
+    suitBtn.style.cssText = 'border:2px solid var(--accent);background:rgba(201,168,76,0.1);color:var(--accent-dark);font-weight:700';
+    tenantBtn.className = 'btn btn-outline';
+  } else {
+    tenantBtn.style.cssText = 'border:2px solid var(--accent);background:rgba(201,168,76,0.1);color:var(--accent-dark);font-weight:700';
+    suitBtn.className = 'btn btn-outline';
+  }
+
+  clearResults();
+}
+
+function clearResults() {
+  document.getElementById('searchResultsDiv').style.display = 'none';
+  document.getElementById('rentalInfoSection').style.display = 'none';
+  selectedRental = null;
+}
+
+async function searchByCode() {
+  const code = document.getElementById('searchSuitCode').value.trim().toUpperCase();
+  if (!code) { showToast('يرجى إدخال كود البدلة', 'warning'); return; }
+
+  showLoading('جاري البحث...');
+  try {
+    const rentals = await getAllRentals();
+    hideLoading();
+
+    const matches = rentals.filter(r => r.suit_id === code && r.status === 'مؤجَّرة');
+
+    if (!matches.length) {
+      showToast('لا توجد عملية تأجير نشطة لهذه البدلة', 'warning');
+      clearResults();
+    } else if (matches.length === 1) {
+      showRentalInfo(matches[0]);
+    } else {
+      showMultipleResults(matches);
+    }
+  } catch (err) {
+    hideLoading();
+    showToast('فشل البحث، حاول مرة أخرى', 'danger');
+  }
+}
+
+async function searchByTenant() {
+  const query = document.getElementById('searchTenantQuery').value.trim();
+  if (!query) { showToast('يرجى إدخال اسم أو رقم موبايل المستأجر', 'warning'); return; }
+
+  showLoading('جاري البحث...');
+  try {
+    const rentals = await getAllRentals();
+    hideLoading();
+
+    const matches = rentals.filter(r =>
+      r.status === 'مؤجَّرة' &&
+      (r.tenant_name.includes(query) || r.tenant_phone.includes(query))
+    );
+
+    if (!matches.length) {
+      showToast('لا توجد نتائج مطابقة لبحثك', 'warning');
+      clearResults();
+    } else if (matches.length === 1) {
+      showRentalInfo(matches[0]);
+    } else {
+      showMultipleResults(matches);
+    }
+  } catch (err) {
+    hideLoading();
+    showToast('فشل البحث، حاول مرة أخرى', 'danger');
+  }
+}
+
+function showMultipleResults(matches) {
+  const container = document.getElementById('multiResults');
+  const resultsDiv = document.getElementById('searchResultsDiv');
+
+  container.innerHTML = `
+    <div style="font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:10px">
+      تم العثور على ${matches.length} عملية — اختر الصحيحة:
+    </div>
+    ${matches.map(r => `
+      <div onclick="showRentalInfo(window.__rentals['${r.rental_id}'])"
+        style="background:var(--white);border:1.5px solid var(--gray-200);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.2s"
+        onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--gray-200)'">
+        <div style="font-weight:700;color:var(--primary)">${r.suit_id} — ${r.tenant_name}</div>
+        <div style="font-size:13px;color:var(--gray-600);margin-top:4px">
+          موبايل: ${r.tenant_phone} | خروج: ${r.checkout_date} | عودة متوقعة: ${r.expected_return}
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  // تخزين مؤقت للنتائج
+  window.__rentals = {};
+  matches.forEach(r => window.__rentals[r.rental_id] = r);
+
+  resultsDiv.style.display = 'block';
+}
+
+function showRentalInfo(rental) {
+  selectedRental = rental;
+
+  document.getElementById('dRentalId').textContent = rental.rental_id;
+  document.getElementById('dSuitId').textContent = rental.suit_id;
+  document.getElementById('dSuitType').textContent = `${rental.suit_type} — ${rental.suit_parts}`;
+  document.getElementById('dSuitDetails').textContent = `${rental.color} / مقاس ${rental.size}`;
+  document.getElementById('dTenantName').textContent = rental.tenant_name;
+  document.getElementById('dTenantPhone').textContent = rental.tenant_phone;
+  document.getElementById('dCheckout').textContent = rental.checkout_date;
+  document.getElementById('dExpReturn').textContent = rental.expected_return;
+  document.getElementById('dDeposit').textContent = `${Number(rental.deposit_amount||0).toLocaleString('ar-EG')} جنيه`;
+  document.getElementById('dRentedBy').textContent = rental.rented_by;
+
+  // تحقق من التأخير
+  const days = daysLate(rental.expected_return);
+  const lateDiv = document.getElementById('lateWarning');
+  if (days > 0) {
+    lateDiv.style.display = 'block';
+    let cls = days === 1 ? 'alert-yellow' : days <= 3 ? 'alert-orange' : 'alert-red';
+    let icon = days === 1 ? '🟡' : days <= 3 ? '🟠' : '🔴';
+    lateDiv.innerHTML = `<div class="alert-banner ${cls}">${icon} تنبيه: هذه البدلة متأخرة بـ <strong>${days} ${days===1?'يوم':'أيام'}</strong> عن موعد العودة</div>`;
+  } else {
+    lateDiv.style.display = 'none';
+  }
+
+  document.getElementById('searchResultsDiv').style.display = 'none';
+  document.getElementById('rentalInfoSection').style.display = 'block';
+  document.getElementById('rentalInfoSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function confirmReturn() {
+  if (!selectedRental) return;
+
+  const actualReturn = document.getElementById('actualReturn').value;
+  const depositReturned = document.getElementById('depositReturned').checked ? 'نعم' : 'لا';
+  const notes = document.getElementById('returnNotes').value.trim();
+
+  if (!actualReturn) {
+    showToast('يرجى تحديد تاريخ الاستلام', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('confirmReturnBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> جاري الحفظ...';
+
+  try {
+    const user = Auth.getCurrentUser();
+    const result = await returnRental(selectedRental.rental_id, {
+      actual_return: actualReturn,
+      returned_by: user.username,
+      deposit_returned: depositReturned,
+      notes,
+      suit_id: selectedRental.suit_id
+    });
+
+    if (result.success) {
+      showToast('✅ تم تسجيل العودة بنجاح وتم تحديث حالة البدلة', 'success', 4000);
+      // إعادة تعيين الصفحة
+      selectedRental = null;
+      document.getElementById('rentalInfoSection').style.display = 'none';
+      document.getElementById('searchSuitCode').value = '';
+      document.getElementById('searchTenantQuery').value = '';
+      document.getElementById('returnNotes').value = '';
+      document.getElementById('depositReturned').checked = false;
+      document.getElementById('depositToggleLabel').textContent = 'لا';
+      document.getElementById('actualReturn').value = today();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      showToast(result.message || 'حدث خطأ أثناء الحفظ', 'danger');
+    }
+  } catch (err) {
+    showToast('فشل الاتصال بقاعدة البيانات', 'danger');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✅ تأكيد الاستلام';
+  }
+}
+</script>
+</body>
+</html>

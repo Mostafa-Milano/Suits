@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — تسجيل الدخول</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="drawable/logo.jpg" alt="Milano Suits" class="login-logo-icon" style="width:72px;height:72px;border-radius:20px;object-fit:cover;box-shadow:0 8px 24px rgba(201,168,76,0.4);">
+      <div class="login-title">Milano Suits</div>
+      <div class="login-subtitle">نظام إدارة تأجير بدل الأفراح</div>
+    </div>
+
+    <div id="loginError" class="login-error"></div>
+
+    <div class="form-group">
+      <label class="form-label" for="username">اسم المستخدم</label>
+      <input
+        type="text"
+        id="username"
+        class="form-control"
+        placeholder="أدخل اسم المستخدم"
+        autocomplete="username"
+      >
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">كلمة السر</label>
+      <div class="password-wrapper">
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          placeholder="أدخل كلمة السر"
+          autocomplete="current-password"
+        >
+        <button type="button" class="password-toggle" id="togglePassword" title="إظهار/إخفاء">
+          👁
+        </button>
+      </div>
+    </div>
+
+    <!-- تذكرني -->
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;margin-bottom:4px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-muted);font-size:14px;user-select:none">
+        <input type="checkbox" id="rememberMe" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
+        تذكرني في هذا الجهاز
+      </label>
+    </div>
+
+    <button id="loginBtn" class="btn btn-accent btn-lg" style="width:100%;margin-top:8px">
+      دخول
+    </button>
+
+    <p class="text-center text-muted text-small" style="margin-top:20px">
+      نظام مخصص لإدارة المحل — تواصل مع المدير للحصول على حساب
+    </p>
+  </div>
+</div>
+
+<script src="assets/js/sheets.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // إذا كان مسجلاً دخوله، توجيه مباشر
+  const user = Auth.getCurrentUser();
+  if (user) {
+    if (user.role === 'admin') {
+      window.location.href = 'admin/dashboard.html';
+    } else {
+      window.location.href = 'employee/home.html';
+    }
+    return;
+  }
+
+  const usernameEl = document.getElementById('username');
+  const passwordEl = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginError = document.getElementById('loginError');
+  const togglePassword = document.getElementById('togglePassword');
+
+  // إظهار/إخفاء كلمة السر
+  togglePassword.addEventListener('click', () => {
+    const isPassword = passwordEl.type === 'password';
+    passwordEl.type = isPassword ? 'text' : 'password';
+    togglePassword.textContent = isPassword ? '🙈' : '👁';
+  });
+
+  // تسجيل الدخول بضغط Enter
+  passwordEl.addEventListener('keypress', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  usernameEl.addEventListener('keypress', e => {
+    if (e.key === 'Enter') passwordEl.focus();
+  });
+
+  loginBtn.addEventListener('click', doLogin);
+
+  async function doLogin() {
+    const username = usernameEl.value.trim();
+    const password = passwordEl.value;
+
+    if (!username || !password) {
+      showError('يرجى إدخال اسم المستخدم وكلمة السر');
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="loading-spinner"></span> جاري الدخول...';
+    loginError.classList.remove('show');
+
+    const rememberMe = document.getElementById('rememberMe').checked;
+    const result = await Auth.login(username, password, rememberMe);
+
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'دخول';
+
+    if (result.success) {
+      if (result.user.role === 'admin') {
+        window.location.href = 'admin/dashboard.html';
+      } else {
+        window.location.href = 'employee/home.html';
+      }
+    } else {
+      showError(result.message);
+    }
+  }
+
+  function showError(msg) {
+    loginError.textContent = msg;
+    loginError.classList.add('show');
+    usernameEl.classList.add('error');
+    passwordEl.classList.add('error');
+    setTimeout(() => {
+      usernameEl.classList.remove('error');
+      passwordEl.classList.remove('error');
+    }, 2000);
+  }
+});
+</script>
+
+</body>
+</html>

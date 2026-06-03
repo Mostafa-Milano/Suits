@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — الرئيسية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="employee-layout">
+
+  <!-- Top Bar -->
+  <header class="emp-topbar">
+    <div class="emp-topbar-logo">
+      <span>👔</span> Milano Suits
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:13px;color:rgba(255,255,255,0.7)" data-user-name></span>
+      <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8)" data-logout>خروج</button>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="emp-content">
+
+    <div id="alertsContainer"></div>
+
+    <!-- Greeting -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:20px;font-weight:800;color:var(--primary)">
+        مرحباً، <span data-user-name></span> 👋
+      </div>
+      <div style="font-size:13px;color:var(--gray-500);margin-top:4px" id="currentDate"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:20px">
+      <div class="stat-card" style="flex-direction:column;text-align:center;padding:20px 16px">
+        <div style="font-size:40px;font-weight:900;color:var(--success)" id="statAvailable">—</div>
+        <div style="font-size:13px;color:var(--gray-600);font-weight:600;margin-top:4px">بدل متاحة 🟢</div>
+      </div>
+      <div class="stat-card" style="flex-direction:column;text-align:center;padding:20px 16px">
+        <div style="font-size:40px;font-weight:900;color:var(--warning)" id="statRented">—</div>
+        <div style="font-size:13px;color:var(--gray-600);font-weight:600;margin-top:4px">بدل مؤجَّرة 🔒</div>
+      </div>
+      <div class="stat-card" style="flex-direction:column;text-align:center;padding:20px 16px">
+        <div style="font-size:40px;font-weight:900;color:var(--orange)" id="statTodayReturns">—</div>
+        <div style="font-size:13px;color:var(--gray-600);font-weight:600;margin-top:4px">استلامات متوقعة اليوم 📦</div>
+      </div>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="action-cards">
+      <a href="rent.html" class="action-card rent">
+        <div class="action-card-icon">🤵</div>
+        <div class="action-card-title">تسجيل تأجير جديد</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:4px">إضافة عملية إيجار</div>
+      </a>
+      <a href="return.html" class="action-card return">
+        <div class="action-card-icon">📦</div>
+        <div class="action-card-title">تسجيل استلام عودة</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:4px">استلام بدلة مُعادة</div>
+      </a>
+    </div>
+
+    <!-- My Recent Operations -->
+    <div class="card" style="margin-top:20px">
+      <div class="card-header">
+        <div class="card-title">📋 آخر عملياتي</div>
+        <a href="mylog.html" class="btn btn-outline btn-sm">عرض الكل</a>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>كود البدلة</th>
+              <th>المستأجر</th>
+              <th>تاريخ الخروج</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="myRecentBody">
+            <tr><td colspan="4" class="text-center text-muted" style="padding:24px">جاري التحميل...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="emp-bottom-nav">
+    <a href="home.html" class="bottom-nav-item active">
+      <span class="nav-icon">🏠</span>
+      الرئيسية
+    </a>
+    <a href="rent.html" class="bottom-nav-item">
+      <span class="nav-icon">🤵</span>
+      تأجير
+    </a>
+    <a href="return.html" class="bottom-nav-item">
+      <span class="nav-icon">📦</span>
+      استلام
+    </a>
+    <a href="mylog.html" class="bottom-nav-item">
+      <span class="nav-icon">📋</span>
+      سجلي
+    </a>
+  </nav>
+
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/alerts.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireEmployee()) return;
+  Auth.fillUserInfo();
+
+  document.getElementById('currentDate').textContent =
+    new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const user = Auth.getCurrentUser();
+
+  try {
+    const [suits, rentals] = await Promise.all([getAllSuits(), getRentalsByEmployee(user.username)]);
+
+    document.getElementById('statAvailable').textContent = suits.filter(s => s.status === 'متاحة').length;
+    document.getElementById('statRented').textContent = suits.filter(s => s.status === 'مؤجَّرة').length;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayReturns = rentals.filter(r => r.status === 'مؤجَّرة' && r.expected_return === todayStr).length;
+    document.getElementById('statTodayReturns').textContent = todayReturns;
+
+    const recent = [...rentals]
+      .sort((a,b) => b.checkout_date.localeCompare(a.checkout_date))
+      .slice(0, 5);
+
+    const tbody = document.getElementById('myRecentBody');
+    if (!recent.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted" style="padding:24px">لا توجد عمليات بعد</td></tr>';
+    } else {
+      tbody.innerHTML = recent.map(r => `
+        <tr>
+          <td data-label="كود البدلة"><strong>${r.suit_id}</strong></td>
+          <td data-label="المستأجر">${r.tenant_name}</td>
+          <td data-label="تاريخ الخروج">${r.checkout_date}</td>
+          <td data-label="الحالة">${r.status === 'مؤجَّرة'
+            ? '<span class="badge badge-warning">مؤجَّرة</span>'
+            : '<span class="badge badge-success">مُعادة</span>'}</td>
+        </tr>
+      `).join('');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+</script>
+</body>
+</html>

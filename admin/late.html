@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — المتأخرون</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../drawable/logo.jpg" alt="Milano Suits" class="logo-icon" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+      <div>
+        <div class="logo-text">Milano Suits</div>
+        <div class="logo-sub">لوحة الإدارة</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">القائمة الرئيسية</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> لوحة التحكم</a>
+      <a href="suits.html" class="nav-link"><span class="nav-icon">👔</span> إدارة البدل</a>
+      <a href="rentals.html" class="nav-link"><span class="nav-icon">📋</span> سجل التأجيرات</a>
+      <a href="late.html" class="nav-link active"><span class="nav-icon">⏰</span> المتأخرون</a>
+      <a href="rent.html" class="nav-link">
+        <span class="nav-icon">🤵</span> تأجير جديد
+      </a>
+      <a href="employees.html" class="nav-link"><span class="nav-icon">👥</span> الموظفون</a>
+      <a href="users.html" class="nav-link"><span class="nav-icon">⚙️</span> إدارة المستخدمين</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>م</div>
+        <div>
+          <div class="user-name" data-user-name></div>
+          <div class="user-role">مدير النظام</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" style="width:100%" data-logout>🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">⏰ تقرير المتأخرين</div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="loadLate()">🔄 تحديث</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Stat Card -->
+      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px,1fr));max-width:700px;margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-icon red">⏰</div>
+          <div>
+            <div class="stat-value" id="lateCount">—</div>
+            <div class="stat-label">بدلة متأخرة الآن</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">⚠️</div>
+          <div>
+            <div class="stat-value" id="level3Count">—</div>
+            <div class="stat-label">متأخرة أكثر من 3 أيام</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⏰ قائمة المتأخرين</div>
+          <span style="font-size:13px;color:var(--gray-500)">مرتبة من الأقدم للأحدث</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>كود البدلة</th>
+                <th>المستأجر</th>
+                <th>الموبايل</th>
+                <th>تاريخ العودة المتوقع</th>
+                <th>عدد أيام التأخير</th>
+                <th>الموظف المؤجِّر</th>
+                <th>مستوى التأخير</th>
+              </tr>
+            </thead>
+            <tbody id="lateBody">
+              <tr><td colspan="7" class="text-center text-muted" style="padding:32px">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/alerts.js"></script>
+<script>
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAdmin()) return;
+  Auth.fillUserInfo();
+  await loadLate();
+});
+
+async function loadLate() {
+  const tbody = document.getElementById('lateBody');
+  tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted" style="padding:24px">جاري التحميل...</td></tr>';
+
+  try {
+    const lateSuits = await getLateSuits();
+
+    document.getElementById('lateCount').textContent = lateSuits.length;
+    document.getElementById('level3Count').textContent =
+      lateSuits.filter(r => daysLate(r.expected_return) > 3).length;
+
+    if (!lateSuits.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="padding:48px;text-align:center">
+        <div class="empty-state-icon">✅</div>
+        <div class="empty-state-text" style="color:var(--success)">لا توجد بدل متأخرة — كل شيء على ما يرام!</div>
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = lateSuits.map(r => {
+      const days = daysLate(r.expected_return);
+      let level, levelClass, rowClass;
+
+      if (days === 1) {
+        level = '🟡 يوم واحد';
+        levelClass = 'late-level-1';
+        rowClass = 'row-late-1';
+      } else if (days <= 3) {
+        level = `🟠 ${days} أيام`;
+        levelClass = 'late-level-2';
+        rowClass = 'row-late-2';
+      } else {
+        level = `🔴 ${days} أيام`;
+        levelClass = 'late-level-3';
+        rowClass = 'row-late-3';
+      }
+
+      return `
+        <tr class="${rowClass}">
+          <td data-label="كود البدلة"><strong>${r.suit_id}</strong></td>
+          <td data-label="المستأجر">${r.tenant_name}</td>
+          <td data-label="الموبايل" style="direction:ltr;text-align:right">${r.tenant_phone}</td>
+          <td data-label="تاريخ العودة المتوقع">${r.expected_return}</td>
+          <td data-label="عدد أيام التأخير"><strong class="${levelClass}">${days} ${days === 1 ? 'يوم' : 'أيام'}</strong></td>
+          <td data-label="الموظف المؤجِّر">${r.rented_by}</td>
+          <td data-label="مستوى التأخير"><span class="${levelClass}">${level}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل البيانات</td></tr>`;
+  }
+}
+
+</script>
+</body>
+</html>

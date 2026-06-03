@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — سجل التأجيرات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../drawable/logo.jpg" alt="Milano Suits" class="logo-icon" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+      <div>
+        <div class="logo-text">Milano Suits</div>
+        <div class="logo-sub">لوحة الإدارة</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">القائمة الرئيسية</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> لوحة التحكم</a>
+      <a href="suits.html" class="nav-link"><span class="nav-icon">👔</span> إدارة البدل</a>
+      <a href="rentals.html" class="nav-link active"><span class="nav-icon">📋</span> سجل التأجيرات</a>
+      <a href="late.html" class="nav-link"><span class="nav-icon">⏰</span> المتأخرون</a>
+      <a href="rent.html" class="nav-link">
+        <span class="nav-icon">🤵</span> تأجير جديد
+      </a>
+      <a href="employees.html" class="nav-link"><span class="nav-icon">👥</span> الموظفون</a>
+      <a href="users.html" class="nav-link"><span class="nav-icon">⚙️</span> إدارة المستخدمين</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>م</div>
+        <div>
+          <div class="user-name" data-user-name></div>
+          <div class="user-role">مدير النظام</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" style="width:100%" data-logout>🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">📋 سجل التأجيرات</div>
+    </div>
+
+    <div class="page-content">
+      <div id="alertsContainer"></div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;align-items:end">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">من تاريخ</label>
+            <input type="date" id="fFrom" class="form-control" onchange="applyFilters()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">إلى تاريخ</label>
+            <input type="date" id="fTo" class="form-control" onchange="applyFilters()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">الموظف</label>
+            <select id="fEmployee" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">الحالة</label>
+            <select id="fStatus" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+              <option>مؤجَّرة</option>
+              <option>مُعادة</option>
+            </select>
+          </div>
+          <div style="margin:0">
+            <button class="btn btn-outline" onclick="resetFilters()" style="width:100%">↺ إعادة تعيين</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 قائمة التأجيرات</div>
+          <span id="rentalsCount" class="badge badge-primary">جاري التحميل...</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>كود العملية</th>
+                <th>كود البدلة</th>
+                <th>المستأجر</th>
+                <th>الموبايل</th>
+                <th>تاريخ الخروج</th>
+                <th>العودة المتوقعة</th>
+                <th>العودة الفعلية</th>
+                <th>السعر</th>
+                <th>التأمين</th>
+                <th>الموظف</th>
+                <th>الحالة</th>
+                <th>تفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="rentalsBody">
+              <tr><td colspan="12" class="text-center text-muted" style="padding:32px">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal تفاصيل -->
+<div id="detailModal" class="modal-overlay">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="detailModalTitle">تفاصيل عملية التأجير</span>
+      <button class="modal-close" onclick="closeDetail()">×</button>
+    </div>
+    <div class="modal-body" id="detailModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeDetail()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/alerts.js"></script>
+<script>
+
+let allRentals = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAdmin()) return;
+  Auth.fillUserInfo();
+  await loadRentals();
+});
+
+async function loadRentals() {
+  try {
+    allRentals = await getAllRentals();
+    allRentals.sort((a,b) => b.checkout_date.localeCompare(a.checkout_date));
+
+    // تعبئة فلتر الموظفين
+    const employees = [...new Set(allRentals.map(r => r.rented_by).filter(Boolean))];
+    const empSel = document.getElementById('fEmployee');
+    employees.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e;
+      opt.textContent = e;
+      empSel.appendChild(opt);
+    });
+
+    renderTable(allRentals);
+  } catch (err) {
+    document.getElementById('rentalsBody').innerHTML =
+      `<tr><td colspan="12" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل البيانات</td></tr>`;
+  }
+}
+
+function renderTable(rentals) {
+  document.getElementById('rentalsCount').textContent = `${rentals.length} عملية`;
+  const tbody = document.getElementById('rentalsBody');
+
+  if (!rentals.length) {
+    tbody.innerHTML = `<tr><td colspan="12" style="padding:40px;text-align:center">
+      <div class="empty-state-icon">📋</div>
+      <div class="empty-state-text">لا توجد عمليات مطابقة للفلتر</div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rentals.map(r => `
+    <tr>
+      <td data-label="كود العملية"><strong>${r.rental_id}</strong></td>
+      <td data-label="كود البدلة">${r.suit_id}</td>
+      <td data-label="المستأجر">${r.tenant_name}</td>
+      <td data-label="الموبايل" style="direction:ltr;text-align:right">${r.tenant_phone}</td>
+      <td data-label="تاريخ الخروج">${r.checkout_date}</td>
+      <td data-label="العودة المتوقعة">${r.expected_return}</td>
+      <td data-label="العودة الفعلية">${r.actual_return || '—'}</td>
+      <td data-label="السعر">${Number(r.rental_price || 0).toLocaleString('ar-EG')} ج</td>
+      <td data-label="التأمين">${Number(r.deposit_amount || 0).toLocaleString('ar-EG')} ج</td>
+      <td data-label="الموظف">${r.rented_by}</td>
+      <td data-label="الحالة">${statusBadge(r.status)}</td>
+      <td data-label="تفاصيل">
+        <button class="btn btn-outline btn-sm" onclick="showDetail('${r.rental_id}')">👁 عرض</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function applyFilters() {
+  const filters = {
+    from: document.getElementById('fFrom').value,
+    to: document.getElementById('fTo').value,
+    employee: document.getElementById('fEmployee').value,
+    status: document.getElementById('fStatus').value
+  };
+  renderTable(filterRentals(allRentals, filters));
+}
+
+function resetFilters() {
+  document.getElementById('fFrom').value = '';
+  document.getElementById('fTo').value = '';
+  document.getElementById('fEmployee').value = 'الكل';
+  document.getElementById('fStatus').value = 'الكل';
+  renderTable(allRentals);
+}
+
+function showDetail(rental_id) {
+  const r = allRentals.find(r => r.rental_id === rental_id);
+  if (!r) return;
+
+  document.getElementById('detailModalTitle').textContent = `تفاصيل العملية: ${rental_id}`;
+  document.getElementById('detailModalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      ${detailItem('كود العملية', r.rental_id)}
+      ${detailItem('كود البدلة', r.suit_id)}
+      ${detailItem('نوع البدلة', `${r.suit_type} — ${r.suit_parts}`)}
+      ${detailItem('اللون / المقاس', `${r.color} / ${r.size}`)}
+      <div style="grid-column:1/-1"><div class="gold-line"></div></div>
+      ${detailItem('المستأجر', r.tenant_name)}
+      ${detailItem('رقم الموبايل', r.tenant_phone)}
+      ${detailItem('العنوان', r.tenant_address)}
+      ${detailItem('رقم البطاقة', r.national_id)}
+      <div style="grid-column:1/-1"><div class="gold-line"></div></div>
+      ${detailItem('تاريخ الخروج', r.checkout_date)}
+      ${detailItem('العودة المتوقعة', r.expected_return)}
+      ${detailItem('العودة الفعلية', r.actual_return || '—')}
+      ${detailItem('طريقة الدفع', r.payment_method)}
+      ${detailItem('سعر الإيجار', `${Number(r.rental_price||0).toLocaleString('ar-EG')} جنيه`)}
+      ${detailItem('مبلغ التأمين', `${Number(r.deposit_amount||0).toLocaleString('ar-EG')} جنيه`)}
+      ${detailItem('تم رد التأمين', r.deposit_returned || '—')}
+      <div style="grid-column:1/-1"><div class="gold-line"></div></div>
+      ${detailItem('الموظف المؤجِّر', r.rented_by)}
+      ${detailItem('الموظف المستلم', r.returned_by || '—')}
+      ${detailItem('الحالة', statusBadgeHtml(r.status))}
+      ${r.notes ? detailItem('ملاحظات', r.notes) : ''}
+    </div>
+  `;
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function detailItem(label, value) {
+  return `<div><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div>`;
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+function statusBadge(status) {
+  if (status === 'مؤجَّرة') return '<span class="badge badge-warning">مؤجَّرة</span>';
+  if (status === 'مُعادة') return '<span class="badge badge-success">مُعادة</span>';
+  return `<span class="badge badge-secondary">${status}</span>`;
+}
+
+function statusBadgeHtml(status) {
+  if (status === 'مؤجَّرة') return '<span class="badge badge-warning">🔒 مؤجَّرة</span>';
+  if (status === 'مُعادة') return '<span class="badge badge-success">✅ مُعادة</span>';
+  return `<span class="badge badge-secondary">${status}</span>`;
+}
+</script>
+</body>
+</html>

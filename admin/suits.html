@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — إدارة البدل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../drawable/logo.jpg" alt="Milano Suits" class="logo-icon" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+      <div>
+        <div class="logo-text">Milano Suits</div>
+        <div class="logo-sub">لوحة الإدارة</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">القائمة الرئيسية</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> لوحة التحكم</a>
+      <a href="suits.html" class="nav-link active"><span class="nav-icon">👔</span> إدارة البدل</a>
+      <a href="rentals.html" class="nav-link"><span class="nav-icon">📋</span> سجل التأجيرات</a>
+      <a href="late.html" class="nav-link"><span class="nav-icon">⏰</span> المتأخرون</a>
+      <a href="rent.html" class="nav-link">
+        <span class="nav-icon">🤵</span> تأجير جديد
+      </a>
+      <a href="employees.html" class="nav-link"><span class="nav-icon">👥</span> الموظفون</a>
+      <a href="users.html" class="nav-link"><span class="nav-icon">⚙️</span> إدارة المستخدمين</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>م</div>
+        <div>
+          <div class="user-name" data-user-name></div>
+          <div class="user-role">مدير النظام</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" style="width:100%" data-logout>🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">👔 إدارة البدل</div>
+      <div class="topbar-actions">
+        <button class="btn btn-accent" onclick="openAddModal()">➕ إضافة بدلة جديدة</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div id="alertsContainer"></div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:end">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">النوع</label>
+            <select id="fType" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+              <option>كلاسيك</option>
+              <option>سهرة</option>
+              <option>عريس</option>
+              <option>قفطان</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">الأجزاء</label>
+            <select id="fParts" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+              <option>كاملة</option>
+              <option>بنطلون فقط</option>
+              <option>جاكيت فقط</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">اللون</label>
+            <select id="fColor" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+              <option>أسود</option>
+              <option>كحلي</option>
+              <option>رمادي</option>
+              <option>بيج</option>
+              <option>أبيض</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">المقاس</label>
+            <select id="fSize" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+              <option>46</option><option>48</option><option>50</option>
+              <option>52</option><option>54</option><option>56</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">الحالة</label>
+            <select id="fStatus" class="form-control" onchange="applyFilters()">
+              <option value="الكل">الكل</option>
+              <option>متاحة</option>
+              <option>مؤجَّرة</option>
+            </select>
+          </div>
+          <div style="margin:0">
+            <button class="btn btn-outline" onclick="resetFilters()" style="width:100%">↺ إعادة تعيين</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📦 قائمة البدل</div>
+          <span id="suitsCount" class="badge badge-primary">جاري التحميل...</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>الكود</th>
+                <th>النوع</th>
+                <th>الأجزاء</th>
+                <th>اللون</th>
+                <th>المقاس</th>
+                <th>الحالة</th>
+                <th>تاريخ الإضافة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="suitsBody">
+              <tr><td colspan="9" class="text-center text-muted" style="padding:32px">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal إضافة/تعديل -->
+<div id="suitModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">إضافة بدلة جديدة</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editSuitId">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">كود البدلة <span class="required">*</span></label>
+          <input type="text" id="mSuitId" class="form-control" placeholder="S-001">
+          <div class="field-error" id="errSuitId">يرجى إدخال كود البدلة</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">النوع <span class="required">*</span></label>
+          <select id="mType" class="form-control">
+            <option value="">اختر النوع</option>
+            <option>كلاسيك</option>
+            <option>سهرة</option>
+            <option>عريس</option>
+            <option>قفطان</option>
+          </select>
+          <div class="field-error" id="errType">يرجى اختيار النوع</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">الأجزاء <span class="required">*</span></label>
+          <select id="mParts" class="form-control">
+            <option value="">اختر الأجزاء</option>
+            <option>كاملة</option>
+            <option>بنطلون فقط</option>
+            <option>جاكيت فقط</option>
+          </select>
+          <div class="field-error" id="errParts">يرجى اختيار الأجزاء</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">المقاس <span class="required">*</span></label>
+          <select id="mSize" class="form-control">
+            <option value="">اختر المقاس</option>
+            <option>46</option><option>48</option><option>50</option>
+            <option>52</option><option>54</option><option>56</option>
+          </select>
+          <div class="field-error" id="errSize">يرجى اختيار المقاس</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">اللون <span class="required">*</span></label>
+        <select id="mColor" class="form-control" onchange="checkOtherColor()">
+          <option value="">اختر اللون</option>
+          <option>أسود</option>
+          <option>كحلي</option>
+          <option>رمادي</option>
+          <option>بيج</option>
+          <option>أبيض</option>
+          <option value="أخرى">أخرى...</option>
+        </select>
+        <div class="field-error" id="errColor">يرجى اختيار اللون</div>
+      </div>
+
+      <div class="form-group" id="otherColorGroup" style="display:none">
+        <label class="form-label">اللون (تحديد) <span class="required">*</span></label>
+        <input type="text" id="mColorOther" class="form-control" placeholder="أدخل اللون">
+      </div>
+
+      <!-- صورة البدلة -->
+      <div class="form-group">
+        <label class="form-label">📷 صورة البدلة (اختياري)</label>
+        <div id="imgUploadArea" onclick="document.getElementById('mSuitImage').click()"
+          style="border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:border-color .2s"
+          onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div id="imgPreviewWrap" style="display:none;margin-bottom:10px">
+            <img id="imgPreview" style="max-height:160px;max-width:100%;border-radius:10px;object-fit:contain">
+          </div>
+          <div id="imgPlaceholder">
+            <div style="font-size:32px;margin-bottom:6px">📷</div>
+            <div style="color:var(--text-muted);font-size:13px">اضغط لاختيار صورة للبدلة</div>
+            <div style="color:var(--text-muted);font-size:11px;margin-top:4px">JPG / PNG / WEBP</div>
+          </div>
+        </div>
+        <input type="file" id="mSuitImage" accept="image/*" style="display:none" onchange="previewImage(event)">
+        <button type="button" id="removeImgBtn" onclick="removeImage()" style="display:none;margin-top:8px;font-size:12px" class="btn btn-outline btn-sm">🗑️ حذف الصورة</button>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-accent" id="saveSuitBtn" onclick="saveSuit()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Image Viewer Modal -->
+<div id="imgViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="closeImgViewer()">
+  <div style="color:white;font-size:16px;font-weight:700" id="imgViewerTitle"></div>
+  <img id="imgViewerImg" style="max-width:90vw;max-height:80vh;border-radius:14px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+  <div style="color:rgba(255,255,255,0.6);font-size:13px">اضغط في أي مكان للإغلاق</div>
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/alerts.js"></script>
+<script>
+
+let allSuits = [];
+let editMode = false;
+
+// ── رفع الصور على imgBB ──
+const IMGBB_API_KEY = 'YOUR_IMGBB_API_KEY'; // ← ضع مفتاح imgBB هنا
+
+async function uploadToImgBB(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('key', IMGBB_API_KEY);
+  const res = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: formData
+  });
+  if (!res.ok) throw new Error('فشل رفع الصورة على imgBB');
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error?.message || 'خطأ في imgBB');
+  return data.data.url; // رابط الصورة الدائم
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAdmin()) return;
+  Auth.fillUserInfo();
+  await loadSuits();
+});
+
+async function loadSuits() {
+  try {
+    allSuits = await getAllSuits();
+    renderTable(allSuits);
+  } catch (err) {
+    document.getElementById('suitsBody').innerHTML =
+      `<tr><td colspan="9" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل البيانات</td></tr>`;
+  }
+}
+
+function renderTable(suits) {
+  document.getElementById('suitsCount').textContent = `${suits.length} بدلة`;
+  const tbody = document.getElementById('suitsBody');
+
+  if (!suits.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="padding:40px;text-align:center">
+      <div class="empty-state-icon">👔</div>
+      <div class="empty-state-text">لا توجد بدل مطابقة للفلتر</div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = suits.map(s => {
+    const img = s.image_url || '';
+    const imgCell = img
+      ? `<img src="${img}" onclick="openImgViewer('${img}','${s.suit_id}')" style="width:48px;height:48px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid var(--accent)">`
+      : `<div style="width:48px;height:48px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer" onclick="openEditModal('${s.suit_id}')">👔</div>`;
+    return `
+    <tr>
+      <td data-label="صورة">${imgCell}</td>
+      <td data-label="الكود"><strong>${s.suit_id}</strong></td>
+      <td data-label="النوع">${s.suit_type}</td>
+      <td data-label="الأجزاء">${s.suit_parts}</td>
+      <td data-label="اللون">${s.color}</td>
+      <td data-label="المقاس">
+        <span class="badge badge-primary">${s.size}</span>
+      </td>
+      <td data-label="الحالة">${statusBadge(s.status)}</td>
+      <td data-label="تاريخ الإضافة">${s.added_date || '—'}</td>
+      <td data-label="إجراءات">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="openEditModal('${s.suit_id}')">✏️ تعديل</button>
+          ${s.status === 'متاحة'
+            ? `<button class="btn btn-danger btn-sm" onclick="handleDelete('${s.suit_id}')">🗑️ حذف</button>`
+            : '<span class="badge badge-warning" style="font-size:11px">مؤجَّرة</span>'
+          }
+        </div>
+      </td>
+    </tr>
+  `; }).join('');
+}
+
+function statusBadge(status) {
+  if (status === 'متاحة') return '<span class="badge badge-success">✅ متاحة</span>';
+  if (status === 'مؤجَّرة') return '<span class="badge badge-warning">🔒 مؤجَّرة</span>';
+  return `<span class="badge badge-secondary">${status}</span>`;
+}
+
+function applyFilters() {
+  const filters = {
+    suit_type: document.getElementById('fType').value,
+    suit_parts: document.getElementById('fParts').value,
+    color: document.getElementById('fColor').value,
+    size: document.getElementById('fSize').value,
+    status: document.getElementById('fStatus').value
+  };
+  renderTable(filterSuits(allSuits, filters));
+}
+
+function resetFilters() {
+  ['fType','fParts','fColor','fSize','fStatus'].forEach(id => {
+    document.getElementById(id).value = 'الكل';
+  });
+  renderTable(allSuits);
+}
+
+function checkOtherColor() {
+  const val = document.getElementById('mColor').value;
+  document.getElementById('otherColorGroup').style.display = val === 'أخرى' ? 'block' : 'none';
+}
+
+async function openAddModal() {
+  editMode = false;
+  document.getElementById('modalTitle').textContent = 'إضافة بدلة جديدة';
+  document.getElementById('editSuitId').value = '';
+  clearForm();
+
+  // توليد كود تلقائي
+  try {
+    const newId = await generateSuitId();
+    document.getElementById('mSuitId').value = newId;
+    document.getElementById('mSuitId').readOnly = false;
+  } catch {}
+
+  document.getElementById('suitModal').classList.add('active');
+}
+
+function openEditModal(suit_id) {
+  editMode = true;
+  const suit = allSuits.find(s => s.suit_id === suit_id);
+  if (!suit) return;
+
+  document.getElementById('modalTitle').textContent = `تعديل بدلة: ${suit_id}`;
+  document.getElementById('editSuitId').value = suit_id;
+  document.getElementById('mSuitId').value = suit.suit_id;
+  document.getElementById('mSuitId').readOnly = true;
+  document.getElementById('mType').value = suit.suit_type;
+  document.getElementById('mParts').value = suit.suit_parts;
+  document.getElementById('mSize').value = suit.size;
+
+  const knownColors = ['أسود','كحلي','رمادي','بيج','أبيض'];
+  if (knownColors.includes(suit.color)) {
+    document.getElementById('mColor').value = suit.color;
+    document.getElementById('otherColorGroup').style.display = 'none';
+  } else {
+    document.getElementById('mColor').value = 'أخرى';
+    document.getElementById('otherColorGroup').style.display = 'block';
+    document.getElementById('mColorOther').value = suit.color;
+  }
+
+  // تحميل الصورة الحالية
+  const existingImg = suit.image_url || '';
+  if (existingImg) {
+    document.getElementById('imgPreview').src = existingImg;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgPlaceholder').style.display = 'none';
+    document.getElementById('removeImgBtn').style.display = 'inline-flex';
+    document.getElementById('imgPreview').dataset.currentUrl = existingImg;
+  } else {
+    document.getElementById('imgPreview').dataset.currentUrl = '';
+  }
+
+  document.getElementById('suitModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('suitModal').classList.remove('active');
+  clearForm();
+}
+
+function clearForm() {
+  ['mSuitId','mType','mParts','mSize','mColor','mColorOther'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? '' : '';
+  });
+  document.getElementById('otherColorGroup').style.display = 'none';
+  document.getElementById('mSuitImage').value = '';
+  document.getElementById('imgPreview').src = '';
+  document.getElementById('imgPreviewWrap').style.display = 'none';
+  document.getElementById('imgPlaceholder').style.display = 'block';
+  document.getElementById('removeImgBtn').style.display = 'none';
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.form-control').forEach(e => e.classList.remove('error'));
+}
+
+async function saveSuit() {
+  const suit_id = document.getElementById('mSuitId').value.trim();
+  const suit_type = document.getElementById('mType').value;
+  const suit_parts = document.getElementById('mParts').value;
+  const size = document.getElementById('mSize').value;
+  const colorRaw = document.getElementById('mColor').value;
+  const colorOther = document.getElementById('mColorOther').value.trim();
+  const color = colorRaw === 'أخرى' ? colorOther : colorRaw;
+
+  let valid = true;
+
+  if (!suit_id) { document.getElementById('errSuitId').classList.add('show'); document.getElementById('mSuitId').classList.add('error'); valid = false; }
+  else { document.getElementById('errSuitId').classList.remove('show'); document.getElementById('mSuitId').classList.remove('error'); }
+
+  if (!suit_type) { document.getElementById('errType').classList.add('show'); document.getElementById('mType').classList.add('error'); valid = false; }
+  else { document.getElementById('errType').classList.remove('show'); document.getElementById('mType').classList.remove('error'); }
+
+  if (!suit_parts) { document.getElementById('errParts').classList.add('show'); document.getElementById('mParts').classList.add('error'); valid = false; }
+  else { document.getElementById('errParts').classList.remove('show'); document.getElementById('mParts').classList.remove('error'); }
+
+  if (!size) { document.getElementById('errSize').classList.add('show'); document.getElementById('mSize').classList.add('error'); valid = false; }
+  else { document.getElementById('errSize').classList.remove('show'); document.getElementById('mSize').classList.remove('error'); }
+
+  if (!color) { document.getElementById('errColor').classList.add('show'); document.getElementById('mColor').classList.add('error'); valid = false; }
+  else { document.getElementById('errColor').classList.remove('show'); document.getElementById('mColor').classList.remove('error'); }
+
+  if (!valid) return;
+
+  const btn = document.getElementById('saveSuitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> جاري الحفظ...';
+
+  try {
+    const user = Auth.getCurrentUser();
+
+    // رفع الصورة على imgBB إذا اختار المستخدم صورة جديدة
+    let image_url = document.getElementById('imgPreview').dataset.currentUrl || '';
+    const imageFile = document.getElementById('mSuitImage').files[0];
+    if (imageFile) {
+      btn.innerHTML = '<span class="loading-spinner"></span> جاري رفع الصورة...';
+      try {
+        image_url = await uploadToImgBB(imageFile);
+      } catch (imgErr) {
+        showToast('⚠️ فشل رفع الصورة: ' + imgErr.message, 'danger');
+        btn.disabled = false;
+        btn.textContent = '💾 حفظ';
+        return;
+      }
+    }
+
+    btn.innerHTML = '<span class="loading-spinner"></span> جاري الحفظ...';
+    const suitData = { suit_id, suit_type, suit_parts, color, size, image_url };
+
+    let result;
+    if (editMode) {
+      result = await updateSuit(suit_id, suitData);
+    } else {
+      suitData.added_by = user.username;
+      suitData.added_date = today();
+      suitData.status = 'متاحة';
+      result = await addSuit(suitData);
+    }
+
+    if (result.success) {
+      closeModal();
+      showToast(editMode ? 'تم تعديل البدلة بنجاح ✅' : 'تمت إضافة البدلة بنجاح ✅');
+      await loadSuits();
+    } else {
+      showToast(result.message || 'حدث خطأ', 'danger');
+    }
+  } catch (err) {
+    showToast('فشل الاتصال بقاعدة البيانات', 'danger');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 حفظ';
+  }
+}
+
+async function handleDelete(suit_id) {
+  const confirmed = await confirmDialog(
+    `هل تريد حذف البدلة <strong>${suit_id}</strong>؟ لا يمكن التراجع عن هذا الإجراء.`,
+    'تأكيد الحذف'
+  );
+  if (!confirmed) return;
+
+  showLoading('جاري الحذف...');
+  try {
+    const result = await deleteSuit(suit_id);
+    if (result.success) {
+      showToast(`تم حذف البدلة ${suit_id} بنجاح`);
+      await loadSuits();
+    } else {
+      showToast(result.message || 'حدث خطأ', 'danger');
+    }
+  } catch (err) {
+    showToast(err.message || 'فشل الحذف', 'danger');
+  } finally {
+    hideLoading();
+  }
+}
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('حجم الصورة كبير جداً — الحد الأقصى 3MB', 'danger');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('imgPreview').src = e.target.result;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgPlaceholder').style.display = 'none';
+    document.getElementById('removeImgBtn').style.display = 'inline-flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  document.getElementById('mSuitImage').value = '';
+  document.getElementById('imgPreview').src = '';
+  document.getElementById('imgPreview').dataset.currentUrl = '';
+  document.getElementById('imgPreviewWrap').style.display = 'none';
+  document.getElementById('imgPlaceholder').style.display = 'block';
+  document.getElementById('removeImgBtn').style.display = 'none';
+}
+
+function openImgViewer(src, suitId) {
+  event.stopPropagation();
+  document.getElementById('imgViewerImg').src = src;
+  document.getElementById('imgViewerTitle').textContent = '👔 بدلة رقم: ' + suitId;
+  document.getElementById('imgViewerModal').style.display = 'flex';
+}
+
+function closeImgViewer() {
+  document.getElementById('imgViewerModal').style.display = 'none';
+}
+</script>
+</body>
+</html>

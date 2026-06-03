@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — الموظفون</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../drawable/logo.jpg" alt="Milano Suits" class="logo-icon" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+      <div>
+        <div class="logo-text">Milano Suits</div>
+        <div class="logo-sub">لوحة الإدارة</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">القائمة الرئيسية</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> لوحة التحكم</a>
+      <a href="suits.html" class="nav-link"><span class="nav-icon">👔</span> إدارة البدل</a>
+      <a href="rentals.html" class="nav-link"><span class="nav-icon">📋</span> سجل التأجيرات</a>
+      <a href="late.html" class="nav-link"><span class="nav-icon">⏰</span> المتأخرون</a>
+      <a href="rent.html" class="nav-link">
+        <span class="nav-icon">🤵</span> تأجير جديد
+      </a>
+      <a href="employees.html" class="nav-link active"><span class="nav-icon">👥</span> الموظفون</a>
+      <a href="users.html" class="nav-link"><span class="nav-icon">⚙️</span> إدارة المستخدمين</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>م</div>
+        <div>
+          <div class="user-name" data-user-name></div>
+          <div class="user-role">مدير النظام</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" style="width:100%" data-logout>🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">👥 سجل الموظفين</div>
+    </div>
+
+    <div class="page-content">
+      <div id="alertsContainer"></div>
+
+      <!-- Summary Table -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <div class="card-title">👥 ملخص أداء الموظفين</div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>اسم الموظف</th>
+                <th>اسم المستخدم</th>
+                <th>إجمالي التأجيرات</th>
+                <th>تأجيرات هذا الشهر</th>
+                <th>آخر نشاط</th>
+                <th>التفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="empSummaryBody">
+              <tr><td colspan="6" class="text-center text-muted" style="padding:32px">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Detail Section -->
+      <div id="empDetailSection" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="empDetailTitle">عمليات الموظف</div>
+            <button class="btn btn-outline btn-sm" onclick="closeDetail()">✖ إغلاق</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>كود العملية</th>
+                  <th>كود البدلة</th>
+                  <th>المستأجر</th>
+                  <th>تاريخ الخروج</th>
+                  <th>تاريخ العودة</th>
+                  <th>السعر</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody id="empDetailBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/alerts.js"></script>
+<script>
+
+let allRentals = [];
+let allUsers = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAdmin()) return;
+  Auth.fillUserInfo();
+  await loadEmployees();
+});
+
+async function loadEmployees() {
+  try {
+    const [rentalsData, usersRes] = await Promise.all([
+      getAllRentals(),
+      postToScript('getUsers', {})
+    ]);
+
+    allRentals = rentalsData;
+    allUsers = (usersRes.users || []).filter(u => u.role === 'employee');
+
+    const todayStr = today();
+    const thisMonth = todayStr.substring(0, 7);
+
+    const tbody = document.getElementById('empSummaryBody');
+
+    if (!allUsers.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:32px">لا يوجد موظفون</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = allUsers.map(u => {
+      const userRentals = allRentals.filter(r => r.rented_by === u.username);
+      const monthRentals = userRentals.filter(r => r.checkout_date && r.checkout_date.startsWith(thisMonth));
+      const sorted = [...userRentals].sort((a,b) => b.checkout_date.localeCompare(a.checkout_date));
+      const lastActivity = sorted.length ? sorted[0].checkout_date : '—';
+
+      return `
+        <tr>
+          <td data-label="اسم الموظف">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px;flex-shrink:0">
+                ${u.name.charAt(0)}
+              </div>
+              <strong>${u.name}</strong>
+            </div>
+          </td>
+          <td data-label="اسم المستخدم"><code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px">${u.username}</code></td>
+          <td data-label="إجمالي التأجيرات">
+            <span class="badge badge-primary">${userRentals.length}</span>
+          </td>
+          <td data-label="تأجيرات هذا الشهر">
+            <span class="badge badge-gold">${monthRentals.length}</span>
+          </td>
+          <td data-label="آخر نشاط">${lastActivity}</td>
+          <td data-label="التفاصيل">
+            <button class="btn btn-outline btn-sm" onclick="showEmpDetail('${u.username}','${u.name}')">
+              📋 عرض العمليات
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+  } catch (err) {
+    document.getElementById('empSummaryBody').innerHTML =
+      `<tr><td colspan="6" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل البيانات</td></tr>`;
+  }
+}
+
+function showEmpDetail(username, name) {
+  const rentals = allRentals
+    .filter(r => r.rented_by === username)
+    .sort((a,b) => b.checkout_date.localeCompare(a.checkout_date));
+
+  document.getElementById('empDetailTitle').textContent = `📋 عمليات الموظف: ${name}`;
+
+  const tbody = document.getElementById('empDetailBody');
+
+  if (!rentals.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted" style="padding:24px">لا توجد عمليات لهذا الموظف</td></tr>';
+  } else {
+    tbody.innerHTML = rentals.map(r => `
+      <tr>
+        <td data-label="كود العملية"><strong>${r.rental_id}</strong></td>
+        <td data-label="كود البدلة">${r.suit_id}</td>
+        <td data-label="المستأجر">${r.tenant_name}</td>
+        <td data-label="تاريخ الخروج">${r.checkout_date}</td>
+        <td data-label="تاريخ العودة">${r.expected_return}</td>
+        <td data-label="السعر">${Number(r.rental_price||0).toLocaleString('ar-EG')} ج</td>
+        <td data-label="الحالة">${statusBadge(r.status)}</td>
+      </tr>
+    `).join('');
+  }
+
+  const section = document.getElementById('empDetailSection');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeDetail() {
+  document.getElementById('empDetailSection').style.display = 'none';
+}
+
+function statusBadge(status) {
+  if (status === 'مؤجَّرة') return '<span class="badge badge-warning">مؤجَّرة</span>';
+  if (status === 'مُعادة') return '<span class="badge badge-success">مُعادة</span>';
+  return `<span class="badge badge-secondary">${status}</span>`;
+}
+</script>
+</body>
+</html>

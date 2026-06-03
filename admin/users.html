@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milano Suits — إدارة المستخدمين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../drawable/logo.jpg" alt="Milano Suits" class="logo-icon" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+      <div><div class="logo-text">Milano Suits</div><div class="logo-sub">لوحة الإدارة</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">القائمة الرئيسية</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> لوحة التحكم</a>
+      <a href="suits.html" class="nav-link"><span class="nav-icon">👔</span> إدارة البدل</a>
+      <a href="rentals.html" class="nav-link"><span class="nav-icon">📋</span> سجل التأجيرات</a>
+      <a href="late.html" class="nav-link"><span class="nav-icon">⏰</span> المتأخرون</a>
+      <a href="rent.html" class="nav-link"><span class="nav-icon">🤵</span> تأجير جديد</a>
+      <a href="employees.html" class="nav-link"><span class="nav-icon">👥</span> الموظفون</a>
+      <a href="users.html" class="nav-link active"><span class="nav-icon">⚙️</span> إدارة المستخدمين</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>م</div>
+        <div><div class="user-name" data-user-name></div><div class="user-role">مدير النظام</div></div>
+      </div>
+      <button class="btn btn-outline" style="width:100%" data-logout>🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">⚙️ إدارة المستخدمين</div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Alerts -->
+      <div id="alertsContainer"></div>
+
+      <!-- Table -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <div class="card-title">👤 المستخدمون</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">➕ إضافة مستخدم</button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingRow" style="padding:40px;text-align:center;color:var(--text-muted)">
+          <div class="spinner-lg" style="margin:0 auto 12px"></div>
+          <div>جاري التحميل من Google Sheets...</div>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper" style="display:none">
+          <table>
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>اسم المستخدم</th>
+                <th>كلمة السر</th>
+                <th>الدور</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Add / Edit Modal -->
+<div id="userModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center">
+  <div class="card" style="width:100%;max-width:440px;margin:20px;padding:0">
+    <div class="card-header">
+      <div class="card-title" id="modalTitle">✏️ تعديل مستخدم</div>
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">✖</button>
+    </div>
+    <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+      <input type="hidden" id="editOriginalUsername">
+
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل *</label>
+        <input type="text" class="form-control" id="fieldName" placeholder="مثال: أحمد محمد">
+      </div>
+      <div class="form-group">
+        <label class="form-label">اسم المستخدم *</label>
+        <input type="text" class="form-control" id="fieldUsername" placeholder="مثال: emp01" dir="ltr">
+      </div>
+      <div class="form-group">
+        <label class="form-label">كلمة السر *</label>
+        <div style="position:relative">
+          <input type="password" class="form-control" id="fieldPassword" placeholder="كلمة السر" dir="ltr" style="padding-left:44px">
+          <button type="button" onclick="togglePass('fieldPassword','eye1')" tabindex="-1"
+            style="position:absolute;left:0;top:0;bottom:0;width:42px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px">
+            <span id="eye1">👁️</span>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">تأكيد كلمة السر *</label>
+        <div style="position:relative">
+          <input type="password" class="form-control" id="fieldPasswordConfirm" placeholder="أعد كتابة كلمة السر" dir="ltr" style="padding-left:44px">
+          <button type="button" onclick="togglePass('fieldPasswordConfirm','eye2')" tabindex="-1"
+            style="position:absolute;left:0;top:0;bottom:0;width:42px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px">
+            <span id="eye2">👁️</span>
+          </button>
+        </div>
+        <div id="passwordMatchMsg" style="font-size:12px;margin-top:5px;display:none"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">الدور *</label>
+        <select class="form-control" id="fieldRole">
+          <option value="admin">مدير (admin)</option>
+          <option value="employee">موظف (employee)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
+        <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveUser()">💾 حفظ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/alerts.js"></script>
+<script>
+
+let usersData = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAdmin()) return;
+  Auth.fillUserInfo();
+  await loadUsers();
+  setupLiveCheck();
+});
+
+async function loadUsers() {
+  document.getElementById('loadingRow').style.display = 'block';
+  document.getElementById('tableWrapper').style.display = 'none';
+  try {
+    const res = await postToScript('getUsers', {});
+    if (!res.success) throw new Error(res.message);
+    usersData = res.users || [];
+    renderTable();
+  } catch (e) {
+    document.getElementById('loadingRow').innerHTML =
+      `<div style="color:var(--danger);padding:32px;text-align:center">❌ فشل التحميل: ${e.message}</div>`;
+  }
+}
+
+function renderTable() {
+  document.getElementById('loadingRow').style.display = 'none';
+  document.getElementById('tableWrapper').style.display = 'block';
+  const tbody = document.getElementById('usersTableBody');
+  if (!usersData.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted)">لا يوجد مستخدمون</td></tr>';
+    return;
+  }
+  tbody.innerHTML = usersData.map((u, i) => `
+    <tr>
+      <td data-label="الاسم">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px;flex-shrink:0">${u.name.charAt(0)}</div>
+          <strong>${u.name}</strong>
+        </div>
+      </td>
+      <td data-label="اسم المستخدم"><code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px">${u.username}</code></td>
+      <td data-label="كلمة السر"><code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px">${u.password}</code></td>
+      <td data-label="الدور">
+        <span class="badge ${u.role === 'admin' ? 'badge-gold' : 'badge-primary'}">${u.role === 'admin' ? '👑 مدير' : '👤 موظف'}</span>
+      </td>
+      <td data-label="الإجراءات" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="openEditModal(${i})">✏️ تعديل</button>
+        <button class="btn btn-sm" style="background:var(--danger);color:white;border:none" onclick="deleteUser('${u.username}','${u.name}')">🗑️ حذف</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = '➕ إضافة مستخدم جديد';
+  document.getElementById('editOriginalUsername').value = '';
+  document.getElementById('fieldName').value = '';
+  document.getElementById('fieldUsername').value = '';
+  document.getElementById('fieldPassword').value = '';
+  document.getElementById('fieldPasswordConfirm').value = '';
+  document.getElementById('fieldRole').value = 'employee';
+  document.getElementById('passwordMatchMsg').style.display = 'none';
+  resetEyes();
+  document.getElementById('userModal').style.display = 'flex';
+}
+
+function openEditModal(i) {
+  const u = usersData[i];
+  document.getElementById('modalTitle').textContent = '✏️ تعديل مستخدم';
+  document.getElementById('editOriginalUsername').value = u.username;
+  document.getElementById('fieldName').value = u.name;
+  document.getElementById('fieldUsername').value = u.username;
+  document.getElementById('fieldPassword').value = u.password;
+  document.getElementById('fieldPasswordConfirm').value = u.password;
+  document.getElementById('fieldRole').value = u.role;
+  document.getElementById('passwordMatchMsg').style.display = 'none';
+  resetEyes();
+  document.getElementById('userModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('userModal').style.display = 'none';
+}
+
+async function saveUser() {
+  const name     = document.getElementById('fieldName').value.trim();
+  const username = document.getElementById('fieldUsername').value.trim();
+  const password = document.getElementById('fieldPassword').value.trim();
+  const confirm  = document.getElementById('fieldPasswordConfirm').value.trim();
+  const role     = document.getElementById('fieldRole').value;
+  const origUser = document.getElementById('editOriginalUsername').value;
+  const isEdit   = !!origUser;
+
+  if (!name || !username || !password || !confirm) {
+    showAlert('alertsContainer', 'error', '⚠️ يرجى تعبئة جميع الحقول');
+    return;
+  }
+  if (password !== confirm) {
+    const msg = document.getElementById('passwordMatchMsg');
+    msg.textContent = '❌ كلمتا السر غير متطابقتين';
+    msg.style.display = 'block';
+    msg.style.color = 'var(--danger)';
+    document.getElementById('fieldPasswordConfirm').focus();
+    return;
+  }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> جاري الحفظ...';
+
+  try {
+    const userObj = { username, password, role, name };
+    const action  = isEdit ? 'updateUser' : 'addUser';
+    if (isEdit) userObj._originalUsername = origUser;
+    const result = await postToScript(action, userObj);
+    if (!result.success) throw new Error(result.message);
+    showAlert('alertsContainer', 'success', isEdit ? '✅ تم تعديل المستخدم بنجاح' : '✅ تمت إضافة المستخدم بنجاح');
+    closeModal();
+    await loadUsers();
+  } catch (e) {
+    showAlert('alertsContainer', 'error', '❌ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 حفظ';
+  }
+}
+
+async function deleteUser(username, name) {
+  if (!confirm(`هل تريد حذف المستخدم "${name}"؟`)) return;
+  try {
+    const result = await postToScript('deleteUser', { username });
+    if (!result.success) throw new Error(result.message);
+    showAlert('alertsContainer', 'warning', `🗑️ تم حذف المستخدم "${name}"`);
+    await loadUsers();
+  } catch (e) {
+    showAlert('alertsContainer', 'error', '❌ ' + e.message);
+  }
+}
+
+function togglePass(fieldId, iconId) {
+  const inp = document.getElementById(fieldId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  document.getElementById(iconId).textContent = inp.type === 'password' ? '👁️' : '🙈';
+}
+
+function resetEyes() {
+  ['fieldPassword','fieldPasswordConfirm'].forEach(id => { document.getElementById(id).type = 'password'; });
+  document.getElementById('eye1').textContent = '👁️';
+  document.getElementById('eye2').textContent = '👁️';
+}
+
+function setupLiveCheck() {
+  ['fieldPassword','fieldPasswordConfirm'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const p  = document.getElementById('fieldPassword').value;
+      const pc = document.getElementById('fieldPasswordConfirm').value;
+      const msg = document.getElementById('passwordMatchMsg');
+      if (!pc) { msg.style.display = 'none'; return; }
+      msg.style.display = 'block';
+      if (p === pc) { msg.textContent = '✅ كلمتا السر متطابقتان'; msg.style.color = '#22c55e'; }
+      else          { msg.textContent = '❌ كلمتا السر غير متطابقتين'; msg.style.color = 'var(--danger)'; }
+    });
+  });
+}
+
+document.getElementById('userModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>

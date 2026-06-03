@@ -2,12 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Milano Suits — سجل التأجيرات</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
 <div class="app-layout">
 
@@ -45,6 +47,9 @@
 
   <main class="main-content">
     <div class="topbar">
+      <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="القائمة" aria-label="إظهار/إخفاء القائمة">
+        ☰
+      </button>
       <div class="topbar-title">📋 سجل التأجيرات</div>
     </div>
 
@@ -269,5 +274,37 @@ function statusBadgeHtml(status) {
   return `<span class="badge badge-secondary">${status}</span>`;
 }
 </script>
+
+<script>
+// Sidebar toggle for mobile
+(function() {
+  var btn = document.getElementById('sidebarToggleBtn');
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  
+  function openSidebar() {
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  
+  if (btn) btn.addEventListener('click', openSidebar);
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+  
+  // Close on nav link click (mobile)
+  document.querySelectorAll('.nav-link').forEach(function(link) {
+    link.addEventListener('click', function() {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

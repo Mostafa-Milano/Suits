@@ -1241,11 +1241,61 @@ textarea.form-control {
   gap: 10px;
 }
 
-/* ==================== RESPONSIVE ==================== */
+
+/* ==================== SIDEBAR TOGGLE BUTTON ==================== */
+
+.sidebar-toggle-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: var(--transition);
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--secondary);
+  transform: scale(1.05);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+}
+
+/* ==================== IMPROVED MOBILE RESPONSIVE ==================== */
 
 @media (max-width: 768px) {
+  .sidebar-toggle-btn {
+    display: flex;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
   .sidebar {
-    transform: translateX(100%);
+    transform: translateX(110%);
+    width: min(280px, 85vw);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .sidebar.open {
@@ -1253,15 +1303,57 @@ textarea.form-control {
   }
 
   .main-content {
-    margin-right: 0;
+    margin-right: 0 !important;
+  }
+
+  .topbar {
+    padding: 0 14px;
+    gap: 10px;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .page-content {
-    padding: 16px;
+    padding: 14px !important;
   }
 
   .stats-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .card-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .form-row, .form-row-3 {
@@ -1289,6 +1381,7 @@ textarea.form-control {
     align-items: center;
     padding: 8px 12px;
     border-bottom: 1px solid var(--gray-100);
+    font-size: 13px;
   }
 
   tbody td::before {
@@ -1297,10 +1390,7 @@ textarea.form-control {
     color: var(--gray-600);
     font-size: 12px;
     flex-shrink: 0;
-  }
-
-  .login-card {
-    padding: 32px 24px;
+    margin-left: 10px;
   }
 
   .action-cards {
@@ -1310,13 +1400,91 @@ textarea.form-control {
 
 @media (max-width: 480px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
-  
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 12px 8px;
+  }
+
   .topbar {
-    padding: 0 16px;
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  .topbar-title {
+    font-size: 14px;
   }
 }
+
+/* ==================== IMPROVED LOGIN PAGE FOR MOBILE ==================== */
+
+@media (max-width: 600px) {
+  .login-page {
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: max(40px, env(safe-area-inset-top, 20px));
+    min-height: 100dvh;
+  }
+
+  .login-card {
+    padding: 32px 22px 28px;
+    border-radius: 16px;
+    max-width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    margin: auto 0;
+  }
+
+  .login-logo {
+    margin-bottom: 28px;
+  }
+
+  .login-logo-icon {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 16px !important;
+  }
+
+  .login-title {
+    font-size: 24px;
+  }
+
+  .login-subtitle {
+    font-size: 12.5px;
+  }
+
+  .form-label {
+    font-size: 13.5px;
+  }
+
+  .form-control {
+    font-size: 16px; /* prevents iOS zoom */
+    padding: 12px 14px;
+  }
+
+  .btn-lg {
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  .password-toggle {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .login-card {
+    padding: 28px 18px 24px;
+  }
+
+  .login-title {
+    font-size: 22px;
+  }
+}
+
 
 /* ==================== SECTION DIVIDER ==================== */
 

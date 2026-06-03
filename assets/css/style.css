@@ -70,7 +70,7 @@ body {
   right: 0;
   height: 100vh;
   z-index: 1000;
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: -4px 0 20px rgba(0,0,0,0.3);
 }
 
@@ -1267,18 +1267,20 @@ textarea.form-control {
 }
 
 .sidebar-overlay {
-  display: none;
+  display: block;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.5);
   z-index: 999;
   backdrop-filter: blur(2px);
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
 .sidebar-overlay.active {
   opacity: 1;
+  pointer-events: all;
 }
 
 /* ==================== IMPROVED MOBILE RESPONSIVE ==================== */
@@ -1288,14 +1290,9 @@ textarea.form-control {
     display: flex;
   }
 
-  .sidebar-overlay {
-    display: block;
-  }
-
   .sidebar {
     transform: translateX(110%);
     width: min(280px, 85vw);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .sidebar.open {

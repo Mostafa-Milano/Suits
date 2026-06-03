@@ -162,129 +162,9 @@
   </main>
 </div>
 
-<script src="../assets/js/auth.js">
-async function loadTodayReturns() {
-  try {
-    const rentals = await getAllRentals();
-    const todayStr = today();
-
-    const todayReturns = rentals.filter(r => {
-      if (r.status !== 'مؤجَّرة') return false;
-      return r.expected_return <= todayStr;
-    }).sort((a, b) => a.expected_return.localeCompare(b.expected_return));
-
-    const tbody = document.getElementById('todayReturnsBody');
-    if (!todayReturns.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:32px"><div class="empty-state-icon">✅</div><div class="empty-state-text" style="color:var(--success)">لا توجد استلامات متوقعة اليوم</div></td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = todayReturns.map(r => {
-      const isLate = r.expected_return < todayStr;
-      const rowClass = isLate ? 'row-late-3' : 'row-late-2';
-      const statusText = isLate
-        ? `🔴 متأخرة — ${daysLate(r.expected_return)} يوم`
-        : '🟠 موعد استلامها اليوم';
-      return `
-        <tr class="${rowClass}">
-          <td data-label="كود البدلة"><strong>${r.suit_id}</strong></td>
-          <td data-label="المستأجر">${r.tenant_name}</td>
-          <td data-label="الموبايل" style="direction:ltr;text-align:right">${r.tenant_phone}</td>
-          <td data-label="تاريخ العودة">${r.expected_return}</td>
-          <td data-label="الموظف">${r.rented_by}</td>
-          <td data-label="التنبيه"><strong>${statusText}</strong></td>
-        </tr>
-      `;
-    }).join('');
-
-  } catch (err) {
-    document.getElementById('todayReturnsBody').innerHTML =
-      '<tr><td colspan="6" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل بيانات الاستلامات</td></tr>';
-  }
-}
-</script>
-<script src="../assets/js/sheets.js">
-async function loadTodayReturns() {
-  try {
-    const rentals = await getAllRentals();
-    const todayStr = today();
-
-    const todayReturns = rentals.filter(r => {
-      if (r.status !== 'مؤجَّرة') return false;
-      return r.expected_return <= todayStr;
-    }).sort((a, b) => a.expected_return.localeCompare(b.expected_return));
-
-    const tbody = document.getElementById('todayReturnsBody');
-    if (!todayReturns.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:32px"><div class="empty-state-icon">✅</div><div class="empty-state-text" style="color:var(--success)">لا توجد استلامات متوقعة اليوم</div></td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = todayReturns.map(r => {
-      const isLate = r.expected_return < todayStr;
-      const rowClass = isLate ? 'row-late-3' : 'row-late-2';
-      const statusText = isLate
-        ? `🔴 متأخرة — ${daysLate(r.expected_return)} يوم`
-        : '🟠 موعد استلامها اليوم';
-      return `
-        <tr class="${rowClass}">
-          <td data-label="كود البدلة"><strong>${r.suit_id}</strong></td>
-          <td data-label="المستأجر">${r.tenant_name}</td>
-          <td data-label="الموبايل" style="direction:ltr;text-align:right">${r.tenant_phone}</td>
-          <td data-label="تاريخ العودة">${r.expected_return}</td>
-          <td data-label="الموظف">${r.rented_by}</td>
-          <td data-label="التنبيه"><strong>${statusText}</strong></td>
-        </tr>
-      `;
-    }).join('');
-
-  } catch (err) {
-    document.getElementById('todayReturnsBody').innerHTML =
-      '<tr><td colspan="6" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل بيانات الاستلامات</td></tr>';
-  }
-}
-</script>
-<script src="../assets/js/alerts.js">
-async function loadTodayReturns() {
-  try {
-    const rentals = await getAllRentals();
-    const todayStr = today();
-
-    const todayReturns = rentals.filter(r => {
-      if (r.status !== 'مؤجَّرة') return false;
-      return r.expected_return <= todayStr;
-    }).sort((a, b) => a.expected_return.localeCompare(b.expected_return));
-
-    const tbody = document.getElementById('todayReturnsBody');
-    if (!todayReturns.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:32px"><div class="empty-state-icon">✅</div><div class="empty-state-text" style="color:var(--success)">لا توجد استلامات متوقعة اليوم</div></td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = todayReturns.map(r => {
-      const isLate = r.expected_return < todayStr;
-      const rowClass = isLate ? 'row-late-3' : 'row-late-2';
-      const statusText = isLate
-        ? `🔴 متأخرة — ${daysLate(r.expected_return)} يوم`
-        : '🟠 موعد استلامها اليوم';
-      return `
-        <tr class="${rowClass}">
-          <td data-label="كود البدلة"><strong>${r.suit_id}</strong></td>
-          <td data-label="المستأجر">${r.tenant_name}</td>
-          <td data-label="الموبايل" style="direction:ltr;text-align:right">${r.tenant_phone}</td>
-          <td data-label="تاريخ العودة">${r.expected_return}</td>
-          <td data-label="الموظف">${r.rented_by}</td>
-          <td data-label="التنبيه"><strong>${statusText}</strong></td>
-        </tr>
-      `;
-    }).join('');
-
-  } catch (err) {
-    document.getElementById('todayReturnsBody').innerHTML =
-      '<tr><td colspan="6" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل بيانات الاستلامات</td></tr>';
-  }
-}
-</script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/sheets.js"></script>
+<script src="../assets/js/alerts.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.requireAdmin()) return;
@@ -390,36 +270,35 @@ async function loadTodayReturns() {
 </script>
 
 
+
+
 <script>
-// Sidebar toggle for mobile
-(function() {
-  var btn = document.getElementById('sidebarToggleBtn');
+document.addEventListener('DOMContentLoaded', function() {
+  var btn     = document.getElementById('sidebarToggleBtn');
   var sidebar = document.querySelector('.sidebar');
   var overlay = document.getElementById('sidebarOverlay');
-  
+  if (!btn || !sidebar || !overlay) return;
+
   function openSidebar() {
     sidebar.classList.add('open');
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
-  
   function closeSidebar() {
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
     document.body.style.overflow = '';
   }
-  
-  if (btn) btn.addEventListener('click', openSidebar);
-  if (overlay) overlay.addEventListener('click', closeSidebar);
-  
-  // Close on nav link click (mobile)
+
+  btn.addEventListener('click', openSidebar);
+  overlay.addEventListener('click', closeSidebar);
+
   document.querySelectorAll('.nav-link').forEach(function(link) {
     link.addEventListener('click', function() {
       if (window.innerWidth <= 768) closeSidebar();
     });
   });
-})();
+});
 </script>
-
 </body>
 </html>

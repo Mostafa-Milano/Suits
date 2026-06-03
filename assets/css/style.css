@@ -876,12 +876,16 @@ textarea.form-control {
 
 .login-page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, #0f3460 100%);
   position: relative;
   overflow: hidden;
+  padding: clamp(16px, 4vw, 40px);
+  padding-top: max(clamp(16px, 4vw, 40px), env(safe-area-inset-top, 0px));
+  padding-bottom: max(clamp(16px, 4vw, 40px), env(safe-area-inset-bottom, 0px));
 }
 
 .login-page::before {
@@ -911,9 +915,8 @@ textarea.form-control {
 .login-card {
   background: var(--white);
   border-radius: 20px;
-  padding: 48px 40px;
-  width: 100%;
-  max-width: 400px;
+  padding: clamp(28px, 6vw, 48px) clamp(20px, 6vw, 40px);
+  width: min(100%, 420px);
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   position: relative;
   z-index: 1;
@@ -1553,4 +1556,97 @@ textarea.form-control {
   background: linear-gradient(90deg, var(--accent), var(--accent-dark));
   border-radius: 2px;
   margin: 24px 0;
+}
+
+/* ==================== SIDEBAR TOGGLE — DESKTOP ==================== */
+
+/* الزر يظهر دائماً (موبايل وديسكتوب) */
+.sidebar-toggle-btn {
+  display: flex !important;
+}
+
+/* حالة الشريط الجانبي المطوي على الديسكتوب */
+body.sidebar-collapsed .sidebar {
+  width: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+body.sidebar-collapsed .main-content {
+  margin-right: 0;
+}
+
+/* انتقال سلس */
+.sidebar {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.main-content {
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* على الموبايل: الـ overlay يعمل فقط عند الفتح */
+@media (max-width: 768px) {
+  body.sidebar-collapsed .sidebar {
+    width: min(280px, 85vw);
+    transform: translateX(110%);
+    overflow: hidden;
+  }
+  body.sidebar-collapsed.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* ==================== LOGIN — FULL MOBILE PROFESSIONAL ==================== */
+
+.login-page {
+  min-height: 100dvh;
+  padding: clamp(16px, 5vw, 40px);
+}
+
+.login-card {
+  width: min(100%, 420px);
+  margin: auto;
+}
+
+/* شاشات صغيرة جداً */
+@media (max-width: 360px) {
+  .login-card {
+    padding: 28px 16px 24px;
+    border-radius: 16px;
+  }
+  .login-logo-icon {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 14px !important;
+  }
+  .login-title { font-size: 20px !important; }
+  .login-subtitle { font-size: 12px !important; }
+  .form-control { font-size: 16px !important; }
+  .btn-lg { font-size: 15px !important; }
+}
+
+/* شاشات متوسطة */
+@media (min-width: 361px) and (max-width: 480px) {
+  .login-card {
+    padding: 36px 24px 28px;
+    border-radius: 18px;
+  }
+  .form-control { font-size: 16px; } /* منع zoom على iOS */
+}
+
+/* landscape على الموبايل */
+@media (max-height: 500px) and (orientation: landscape) {
+  .login-page {
+    align-items: flex-start;
+    padding-top: 16px;
+  }
+  .login-logo { margin-bottom: 16px; }
+  .login-logo-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .login-title { font-size: 20px; }
 }

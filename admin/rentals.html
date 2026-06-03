@@ -277,63 +277,8 @@ function statusBadgeHtml(status) {
 
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var btn     = document.getElementById('sidebarToggleBtn');
-  var sidebar = document.querySelector('.sidebar');
-  var overlay = document.getElementById('sidebarOverlay');
-  if (!btn || !sidebar || !overlay) return;
 
-  function openSidebar() {
-    sidebar.classList.add('open');
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
 
-  btn.addEventListener('click', openSidebar);
-  overlay.addEventListener('click', closeSidebar);
-
-  document.querySelectorAll('.nav-link').forEach(function(link) {
-    link.addEventListener('click', function() {
-      if (window.innerWidth <= 768) closeSidebar();
-    });
-  });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  var btn     = document.getElementById("sidebarToggleBtn");
-  var sidebar = document.querySelector(".sidebar");
-  var overlay = document.getElementById("sidebarOverlay");
-  if (!btn || !sidebar || !overlay) return;
-
-  btn.addEventListener("click", function() {
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("active");
-    document.body.style.overflow = sidebar.classList.contains("open") ? "hidden" : "";
-  });
-
-  overlay.addEventListener("click", function() {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("active");
-    document.body.style.overflow = "";
-  });
-
-  document.querySelectorAll(".nav-link").forEach(function(link) {
-    link.addEventListener("click", function() {
-      if (window.innerWidth <= 768) {
-        sidebar.classList.remove("open");
-        overlay.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    });
-  });
-});
-</script>
+<script src="../assets/js/sidebar.js"></script>
 </body>
 </html>

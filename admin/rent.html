@@ -616,7 +616,6 @@ function openImgViewer() {
 
 function openImgViewerSrc(src, suitId) {
   document.getElementById('imgViewerImg').src = src;
-  document.getElementById('imgViewerTitle').textContent = '👔 بدلة رقم: ' + suitId;
   document.getElementById('imgViewerModal').style.display = 'flex';
 }
 
@@ -626,10 +625,13 @@ function closeImgViewer() {
 </script>
 
 <!-- Image Viewer Modal -->
-<div id="imgViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="closeImgViewer()">
-  <div style="color:white;font-size:16px;font-weight:700" id="imgViewerTitle"></div>
-  <img id="imgViewerImg" style="max-width:90vw;max-height:80vh;border-radius:14px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
-  <div style="color:rgba(255,255,255,0.6);font-size:13px">اضغط في أي مكان للإغلاق</div>
+<div id="imgViewerModal" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center" onclick="closeImgViewer()">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(8px)"></div>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:0" onclick="event.stopPropagation()">
+    <img id="imgViewerImg" style="max-width:88vw;max-height:88vh;border-radius:18px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,0.8);display:block">
+    <button onclick="closeImgViewer()" style="margin-top:18px;padding:10px 36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(4px)">إغلاق</button>
+  </div>
+  <button onclick="closeImgViewer()" style="position:fixed;top:16px;left:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:white;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;z-index:10">✕</button>
 </div>
 
 

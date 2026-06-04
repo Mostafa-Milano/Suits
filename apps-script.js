@@ -88,8 +88,9 @@ function getUsersSheet()   { return SpreadsheetApp.openById(SPREADSHEET_ID).getS
 
 function findRow(sheet, colIndex, value) {
   const data = sheet.getDataRange().getValues();
+  const normalizedValue = String(value).trim().toUpperCase();
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][colIndex]) === String(value)) return i + 1;
+    if (String(data[i][colIndex]).trim().toUpperCase() === normalizedValue) return i + 1;
   }
   return -1;
 }
@@ -100,7 +101,7 @@ function findRow(sheet, colIndex, value) {
 function getSuits() {
   const data = getSuitsSheet().getDataRange().getValues();
   const suits = data.slice(1).filter(r => r[0]).map(r => ({
-    suit_id:    r[0] || '', suit_type:  r[1] || '', suit_parts: r[2] || '',
+    suit_id:    String(r[0] || '').trim(), suit_type:  r[1] || '', suit_parts: r[2] || '',
     color:      r[3] || '', size:       r[4] || '', status:     r[5] || '',
     added_by:   r[6] || '', added_date: r[7] || '', image_url:  r[8] || ''
   }));

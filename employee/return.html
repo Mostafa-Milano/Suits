@@ -182,7 +182,7 @@ async function searchByCode() {
     const rentals = await getAllRentals();
     hideLoading();
 
-    const matches = rentals.filter(r => r.suit_id === code && r.status === 'مؤجَّرة');
+    const matches = rentals.filter(r => String(r.suit_id).trim().toUpperCase() === code && r.status === 'مؤجَّرة');
 
     if (!matches.length) {
       showToast('لا توجد عملية تأجير نشطة لهذه البدلة', 'warning');

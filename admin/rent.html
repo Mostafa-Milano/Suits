@@ -384,14 +384,16 @@ function selectSuitFromTable(suit_id) {
   const row = document.getElementById(`row-${suit_id}`);
   if (row) row.classList.add('selected');
 
+  const normalizedId = String(suit_id).trim().toUpperCase();
+
   // البحث عن بيانات البدلة من الكاش أولاً
   if (_cachedAvailableSuits) {
-    const suit = _cachedAvailableSuits.find(s => s.suit_id === suit_id);
+    const suit = _cachedAvailableSuits.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
     if (suit) { setSelectedSuit(suit); return; }
   }
   getAvailableSuits().then(suits => {
     _cachedAvailableSuits = suits;
-    const suit = suits.find(s => s.suit_id === suit_id);
+    const suit = suits.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
     if (suit) setSelectedSuit(suit);
   });
 }

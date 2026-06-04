@@ -157,7 +157,8 @@ async function getAvailableSuits() {
 // 3. البحث عن بدلة بالكود
 async function getSuitById(suit_id) {
   const suits = await getAllSuits();
-  return suits.find(s => s.suit_id === suit_id) || null;
+  const normalizedId = String(suit_id).trim().toUpperCase();
+  return suits.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId) || null;
 }
 
 // 4. إضافة بدلة جديدة

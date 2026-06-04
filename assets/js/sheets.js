@@ -120,12 +120,19 @@ function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d)) return dateStr;
-  return d.toISOString().split('T')[0];
+  return d.toLocaleDateString('ar-EG', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-// الحصول على اليوم
+// الحصول على اليوم بتوقيت مصر
 function today() {
-  return new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const cairoDate = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));
+  const y = cairoDate.getFullYear();
+  const m = String(cairoDate.getMonth() + 1).padStart(2, '0');
+  const d = String(cairoDate.getDate()).padStart(2, '0');
+  const h = String(cairoDate.getHours()).padStart(2, '0');
+  const min = String(cairoDate.getMinutes()).padStart(2, '0');
+  return `${y}-${m}-${d} ${h}:${min}`;
 }
 
 // حساب عدد أيام التأخير

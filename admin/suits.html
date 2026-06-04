@@ -347,6 +347,22 @@
 let allSuits = [];
 let editMode = false;
 
+function formatAddedDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  // عرض التاريخ والوقت بتوقيت مصر
+  return d.toLocaleString('ar-EG', {
+    timeZone: 'Africa/Cairo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
 // ── رفع الصور على imgBB ──
 const IMGBB_API_KEY = 'c84815e518250c59f95a550da8a2d47e'; // ← ضع مفتاح imgBB هنا
 
@@ -416,7 +432,7 @@ function renderTable(suits) {
         <span class="badge badge-primary">${s.size}</span>
       </td>
       <td data-label="الحالة">${statusBadge(s.status)}</td>
-      <td data-label="تاريخ الإضافة">${s.added_date || '—'}</td>
+      <td data-label="تاريخ الإضافة">${formatAddedDate(s.added_date)}</td>
       <td data-label="إجراءات">
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn btn-outline btn-sm" onclick="openEditModal('${s.suit_id}')">✏️ تعديل</button>

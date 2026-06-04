@@ -322,6 +322,10 @@
     <!-- Image -->
     <div style="position:relative;background:#111;min-height:260px;display:flex;align-items:center;justify-content:center">
       <img id="imgViewerImg" style="max-width:100%;max-height:55vh;object-fit:contain;display:block">
+      <div id="imgViewerNoImg" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px">
+        <div style="font-size:64px">👔</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:14px">لم يتم رفع صورة لهذه البدلة</div>
+      </div>
     </div>
     <!-- Details -->
     <div style="padding:18px 20px 20px;color:white">
@@ -397,7 +401,11 @@ function renderTable(suits) {
              onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
            <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px">🔍</div>
          </div>`
-      : `<div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--gray-100),var(--gray-200));display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;border:2px dashed var(--border)" onclick="openEditModal('${s.suit_id}')" title="لا توجد صورة - اضغط للتعديل">👔</div>`;
+      : `<div class="suit-img-wrap" onclick="openImgViewer(null,'${s.suit_id}',${JSON.stringify(s)})">
+           <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--gray-100),var(--gray-200));display:flex;align-items:center;justify-content:center;font-size:26px;border:2px dashed var(--border);cursor:pointer;transition:transform .15s"
+             onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">👔</div>
+           <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.4);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px">🔍</div>
+         </div>`;
     return `
     <tr>
       <td data-label="صورة">${imgCell}</td>
@@ -662,7 +670,17 @@ function removeImage() {
 
 function openImgViewer(src, suitId, suit) {
   if (event) event.stopPropagation();
-  document.getElementById('imgViewerImg').src = src;
+  const imgEl = document.getElementById('imgViewerImg');
+  const noImgMsg = document.getElementById('imgViewerNoImg');
+  if (src) {
+    imgEl.src = src;
+    imgEl.style.display = 'block';
+    if (noImgMsg) noImgMsg.style.display = 'none';
+  } else {
+    imgEl.src = '';
+    imgEl.style.display = 'none';
+    if (noImgMsg) noImgMsg.style.display = 'flex';
+  }
   document.getElementById('imgViewerTitle').textContent = '👔 بدلة رقم: ' + suitId;
 
   // Build details grid

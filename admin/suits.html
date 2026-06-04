@@ -6,6 +6,9 @@
   <title>Milano Suits — إدارة البدل</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .suit-img-wrap { position:relative; display:inline-block; width:56px; height:56px; }
+  </style>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -278,7 +281,7 @@
       <!-- صورة البدلة -->
       <div class="form-group">
         <label class="form-label">📷 صورة البدلة (اختياري)</label>
-        <div id="imgUploadArea" onclick="document.getElementById('mSuitImage').click()"
+        <div id="imgUploadArea" onclick="openCamera()"
           style="border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:border-color .2s"
           onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
           <div id="imgPreviewWrap" style="display:none;margin-bottom:10px">
@@ -286,11 +289,18 @@
           </div>
           <div id="imgPlaceholder">
             <div style="font-size:32px;margin-bottom:6px">📷</div>
-            <div style="color:var(--text-muted);font-size:13px">اضغط لاختيار صورة للبدلة</div>
-            <div style="color:var(--text-muted);font-size:11px;margin-top:4px">JPG / PNG / WEBP</div>
+            <div style="color:var(--text-muted);font-size:13px">اضغط لفتح الكاميرا وتصوير البدلة</div>
+            <div style="color:var(--text-muted);font-size:11px;margin-top:4px">سيتم رفع الصورة تلقائياً على ImgBB</div>
           </div>
         </div>
-        <input type="file" id="mSuitImage" accept="image/*" style="display:none" onchange="previewImage(event)">
+        <!-- input للكاميرا المباشرة -->
+        <input type="file" id="mSuitImage" accept="image/*" capture="environment" style="display:none" onchange="previewImage(event)">
+        <!-- input للاختيار من المعرض (بديل) -->
+        <input type="file" id="mSuitImageGallery" accept="image/*" style="display:none" onchange="previewImage(event)">
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button type="button" onclick="openCamera()" class="btn btn-accent btn-sm" style="flex:1">📷 فتح الكاميرا</button>
+          <button type="button" onclick="document.getElementById('mSuitImageGallery').click()" class="btn btn-outline btn-sm" style="flex:1">🖼️ من المعرض</button>
+        </div>
         <button type="button" id="removeImgBtn" onclick="removeImage()" style="display:none;margin-top:8px;font-size:12px" class="btn btn-outline btn-sm">🗑️ حذف الصورة</button>
       </div>
 
@@ -303,10 +313,26 @@
 </div>
 
 <!-- Image Viewer Modal -->
-<div id="imgViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="closeImgViewer()">
-  <div style="color:white;font-size:16px;font-weight:700" id="imgViewerTitle"></div>
-  <img id="imgViewerImg" style="max-width:90vw;max-height:80vh;border-radius:14px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
-  <div style="color:rgba(255,255,255,0.6);font-size:13px">اضغط في أي مكان للإغلاق</div>
+<div id="imgViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:0" onclick="handleViewerClick(event)">
+  <!-- Close btn -->
+  <button onclick="closeImgViewer()" style="position:fixed;top:16px;left:16px;background:rgba(255,255,255,0.15);border:none;color:white;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;z-index:2001">✕</button>
+
+  <!-- Card container -->
+  <div onclick="event.stopPropagation()" style="background:#1a1a2e;border-radius:20px;overflow:hidden;max-width:420px;width:92vw;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:flex;flex-direction:column">
+    <!-- Image -->
+    <div style="position:relative;background:#111;min-height:260px;display:flex;align-items:center;justify-content:center">
+      <img id="imgViewerImg" style="max-width:100%;max-height:55vh;object-fit:contain;display:block">
+    </div>
+    <!-- Details -->
+    <div style="padding:18px 20px 20px;color:white">
+      <div id="imgViewerTitle" style="font-size:17px;font-weight:800;margin-bottom:14px;text-align:center;color:#f0c040"></div>
+      <div id="imgViewerDetails" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:13px"></div>
+      <div style="margin-top:16px;text-align:center">
+        <button onclick="closeImgViewer()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;padding:10px 28px;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit">إغلاق</button>
+      </div>
+    </div>
+  </div>
+  <div style="color:rgba(255,255,255,0.35);font-size:12px;margin-top:12px">اضغط خارج الصورة للإغلاق</div>
 </div>
 
 <script src="../assets/js/sheets.js"></script>
@@ -318,12 +344,13 @@ let allSuits = [];
 let editMode = false;
 
 // ── رفع الصور على imgBB ──
-const IMGBB_API_KEY = 'YOUR_IMGBB_API_KEY'; // ← ضع مفتاح imgBB هنا
+const IMGBB_API_KEY = 'c84815e518250c59f95a550da8a2d47e'; // ← ضع مفتاح imgBB هنا
 
 async function uploadToImgBB(file) {
   const formData = new FormData();
   formData.append('image', file);
   formData.append('key', IMGBB_API_KEY);
+  formData.append('album', 'tBp4DQ'); // ألبوم البدل
   const res = await fetch('https://api.imgbb.com/1/upload', {
     method: 'POST',
     body: formData
@@ -365,8 +392,12 @@ function renderTable(suits) {
   tbody.innerHTML = suits.map(s => {
     const img = s.image_url || '';
     const imgCell = img
-      ? `<img src="${img}" onclick="openImgViewer('${img}','${s.suit_id}')" style="width:48px;height:48px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid var(--accent)">`
-      : `<div style="width:48px;height:48px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer" onclick="openEditModal('${s.suit_id}')">👔</div>`;
+      ? `<div class="suit-img-wrap" onclick="openImgViewer('${img}','${s.suit_id}',${JSON.stringify(s)})">
+           <img src="${img}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent);display:block;transition:transform .15s" 
+             onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+           <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px">🔍</div>
+         </div>`
+      : `<div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--gray-100),var(--gray-200));display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;border:2px dashed var(--border)" onclick="openEditModal('${s.suit_id}')" title="لا توجد صورة - اضغط للتعديل">👔</div>`;
     return `
     <tr>
       <td data-label="صورة">${imgCell}</td>
@@ -596,6 +627,13 @@ async function handleDelete(suit_id) {
   }
 }
 
+function openCamera() {
+  // فتح الكاميرا مباشرة
+  const cameraInput = document.getElementById('mSuitImage');
+  cameraInput.setAttribute('capture', 'environment'); // كاميرا خلفية
+  cameraInput.click();
+}
+
 function previewImage(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -622,11 +660,32 @@ function removeImage() {
   document.getElementById('removeImgBtn').style.display = 'none';
 }
 
-function openImgViewer(src, suitId) {
-  event.stopPropagation();
+function openImgViewer(src, suitId, suit) {
+  if (event) event.stopPropagation();
   document.getElementById('imgViewerImg').src = src;
   document.getElementById('imgViewerTitle').textContent = '👔 بدلة رقم: ' + suitId;
+
+  // Build details grid
+  const details = [
+    { label: 'النوع', value: suit.suit_type || '—' },
+    { label: 'الأجزاء', value: suit.suit_parts || '—' },
+    { label: 'اللون', value: suit.color || '—' },
+    { label: 'المقاس', value: suit.size || '—' },
+    { label: 'الحالة', value: suit.status === 'متاحة' ? '✅ متاحة' : '🔒 مؤجَّرة' },
+    { label: 'تاريخ الإضافة', value: suit.added_date || '—' },
+  ];
+  document.getElementById('imgViewerDetails').innerHTML = details.map(d =>
+    `<div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:8px 10px">
+       <div style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:2px">${d.label}</div>
+       <div style="font-weight:700;font-size:13px">${d.value}</div>
+     </div>`
+  ).join('');
+
   document.getElementById('imgViewerModal').style.display = 'flex';
+}
+
+function handleViewerClick(e) {
+  if (e.target === document.getElementById('imgViewerModal')) closeImgViewer();
 }
 
 function closeImgViewer() {

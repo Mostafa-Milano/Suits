@@ -34,47 +34,37 @@
 
           <!-- TAB 1: البحث -->
           <div id="tab-search" class="tab-content active">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">النوع</label>
-                <select id="sType" class="form-control">
-                  <option value="">الكل</option>
-                  <option>كلاسيك</option><option>فورمال</option>
-                  <option>سوارية</option>
-                </select>
+            <!-- حالة تحميل الفلاتر -->
+            <div id="filtersLoadingMsg" style="text-align:center;padding:14px;color:var(--gray-500);font-size:14px">
+              <span class="loading-spinner"></span> جاري تحميل بيانات البدل...
+            </div>
+            <div id="filtersLoadingErr" style="display:none;padding:10px 14px;background:#f8d7da;color:#721c24;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+
+            <div id="filtersContainer" style="display:none">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">النوع</label>
+                  <select id="sType" class="form-control"><option value="">الكل</option></select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">الأجزاء</label>
+                  <select id="sParts" class="form-control"><option value="">الكل</option></select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">اللون</label>
+                  <select id="sColor" class="form-control"><option value="">الكل</option></select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">المقاس</label>
+                  <select id="sSize" class="form-control"><option value="">الكل</option></select>
+                </div>
               </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">الأجزاء</label>
-                <select id="sParts" class="form-control">
-                  <option value="">الكل</option>
-                  <option>كاملة</option>
-                  <option>بنطلون فقط</option>
-                  <option>جاكيت فقط</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">اللون</label>
-                <select id="sColor" class="form-control">
-                  <option value="">الكل</option>
-                  <option>أسود</option><option>كحلي</option>
-                  <option>رمادي</option><option>رصاصي</option>
-                  <option>بيج</option><option>أبيض</option>
-                  <option>سكري</option><option>زيتي</option>
-                  <option>منت جرين</option><option>بترولي</option>
-                  <option>هافان</option><option>بني فاتح</option>
-                  <option>بني غامق</option><option>نبيتي</option>
-                  <option>سماوي</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">المقاس</label>
-                <select id="sSize" class="form-control">
-                  <option value="">الكل</option>
-                  <option>20</option>                  <option>22</option>                  <option>24</option>                  <option>26</option>                  <option>28</option>                  <option>30</option>                  <option>32</option>                  <option>34</option>                  <option>36</option>                  <option>38</option>                  <option>40</option>                  <option>42</option>                  <option>44</option>                  <option>46</option>                  <option>48</option>                  <option>50</option>                  <option>52</option>                  <option>54</option>                  <option>56</option>                  <option>58</option>                  <option>60</option>                  <option>62</option>
-                </select>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="searchSuits()">🔍 بحث</button>
+                <button class="btn btn-outline" onclick="showAllSuits()" style="font-size:13px">📋 عرض الكل</button>
+                <span id="suitsCountBadge" style="font-size:13px;color:var(--gray-500)"></span>
               </div>
             </div>
-            <button class="btn btn-primary" onclick="searchSuits()">🔍 بحث</button>
 
             <div id="searchResults" style="margin-top:16px;display:none">
               <div class="table-wrapper">
@@ -225,7 +215,80 @@
 <script src="../assets/js/auth.js"></script>
 <script>
 
-let selectedSuit = null;
+// كاش البدل المتاحة
+let _cachedAvailableSuits = null;
+
+async function loadFiltersFromSheet() {
+  const loadingMsg = document.getElementById('filtersLoadingMsg');
+  const errMsg = document.getElementById('filtersLoadingErr');
+  const container = document.getElementById('filtersContainer');
+  try {
+    const suits = await getAvailableSuits();
+    _cachedAvailableSuits = suits;
+
+    // استخراج القيم الفريدة
+    const unique = (key) => [...new Set(suits.map(s => s[key]).filter(Boolean))].sort();
+    const types  = unique('suit_type');
+    const parts  = unique('suit_parts');
+    const colors = unique('color');
+    const sizes  = unique('size').sort((a,b) => Number(a) - Number(b) || a.localeCompare(b));
+
+    function fillSelect(id, values) {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">الكل</option>' +
+        values.map(v => `<option value="${v}">${v}</option>`).join('');
+    }
+    fillSelect('sType',  types);
+    fillSelect('sParts', parts);
+    fillSelect('sColor', colors);
+    fillSelect('sSize',  sizes);
+
+    loadingMsg.style.display = 'none';
+    container.style.display = 'block';
+    document.getElementById('suitsCountBadge').textContent =
+      suits.length ? `(${suits.length} بدلة متاحة في الشيت)` : '(لا توجد بدل متاحة حالياً)';
+  } catch (err) {
+    loadingMsg.style.display = 'none';
+    errMsg.style.display = 'block';
+    errMsg.textContent = '❌ فشل تحميل البدل من الشيت: ' + err.message +
+      ' — تحقق من APPS_SCRIPT_URL في sheets.js';
+    container.style.display = 'block'; // نظهر الفلاتر بشكل أساسي حتى يتمكن من المحاولة يدوياً
+  }
+}
+
+async function showAllSuits() {
+  showLoading('جاري تحميل كل البدل...');
+  try {
+    const suits = _cachedAvailableSuits || await getAvailableSuits();
+    _cachedAvailableSuits = suits;
+    hideLoading();
+    renderSuitsTable(suits);
+  } catch(err) {
+    hideLoading();
+    showToast('فشل تحميل البدل: ' + err.message, 'danger');
+  }
+}
+
+function renderSuitsTable(results) {
+  const container = document.getElementById('searchResults');
+  const tbody = document.getElementById('searchResultsBody');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة للبحث</td></tr>';
+  } else {
+    tbody.innerHTML = results.map(s => `
+      <tr onclick="selectSuitFromTable('${s.suit_id}')" id="row-${s.suit_id}" style="cursor:pointer">
+        <td><input type="radio" name="suitPick" value="${s.suit_id}" onchange="selectSuitFromTable('${s.suit_id}')"></td>
+        <td><strong>${s.suit_id}</strong></td>
+        <td>${s.suit_type}</td>
+        <td>${s.suit_parts}</td>
+        <td>${s.color}</td>
+        <td><span class="badge badge-primary">${s.size}</span></td>
+      </tr>
+    `).join('');
+  }
+  container.style.display = 'block';
+  clearSelectedSuit();
+}
 
 const SuitImages = {
   _key: 'milano_suit_images',
@@ -242,6 +305,9 @@ const SuitImages = {
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requireEmployee()) return;
+
+  // تحميل الفلاتر ديناميكياً من الشيت
+  loadFiltersFromSheet();
 
   // تعيين تاريخ اليوم كافتراضي
   const todayStr = today();
@@ -274,32 +340,15 @@ async function searchSuits() {
 
   showLoading('جاري البحث...');
   try {
-    const available = await getAvailableSuits();
+    // استخدم الكاش إذا متوفر، وإلا اجلب من الشيت
+    const available = _cachedAvailableSuits || await getAvailableSuits();
+    _cachedAvailableSuits = available;
     const results = filterSuits(available, filters);
     hideLoading();
-
-    const container = document.getElementById('searchResults');
-    const tbody = document.getElementById('searchResultsBody');
-
-    if (!results.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة للبحث</td></tr>';
-    } else {
-      tbody.innerHTML = results.map(s => `
-        <tr onclick="selectSuitFromTable('${s.suit_id}')" id="row-${s.suit_id}" style="cursor:pointer">
-          <td><input type="radio" name="suitPick" value="${s.suit_id}" onchange="selectSuitFromTable('${s.suit_id}')"></td>
-          <td><strong>${s.suit_id}</strong></td>
-          <td>${s.suit_type}</td>
-          <td>${s.suit_parts}</td>
-          <td>${s.color}</td>
-          <td><span class="badge badge-primary">${s.size}</span></td>
-        </tr>
-      `).join('');
-    }
-    container.style.display = 'block';
-    clearSelectedSuit();
+    renderSuitsTable(results);
   } catch (err) {
     hideLoading();
-    showToast('فشل تحميل البدل', 'danger');
+    showToast('فشل تحميل البدل: ' + err.message, 'danger');
   }
 }
 
@@ -311,8 +360,13 @@ function selectSuitFromTable(suit_id) {
   const row = document.getElementById(`row-${suit_id}`);
   if (row) row.classList.add('selected');
 
-  // البحث عن بيانات البدلة من النتائج
+  // البحث عن بيانات البدلة من الكاش أولاً ثم الشيت
+  if (_cachedAvailableSuits) {
+    const suit = _cachedAvailableSuits.find(s => s.suit_id === suit_id);
+    if (suit) { setSelectedSuit(suit); return; }
+  }
   getAvailableSuits().then(suits => {
+    _cachedAvailableSuits = suits;
     const suit = suits.find(s => s.suit_id === suit_id);
     if (suit) setSelectedSuit(suit);
   });

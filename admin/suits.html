@@ -67,9 +67,9 @@
             <select id="fType" class="form-control" onchange="applyFilters()">
               <option value="الكل">الكل</option>
               <option>كلاسيك</option>
-              <option>سهرة</option>
-              <option>عريس</option>
-              <option>قفطان</option>
+              <option>فورمال</option>
+              <option>سوارية</option>
+
             </select>
           </div>
           <div class="form-group" style="margin:0">
@@ -88,17 +88,47 @@
               <option>أسود</option>
               <option>كحلي</option>
               <option>رمادي</option>
+              <option>رصاصي</option>
               <option>بيج</option>
               <option>أبيض</option>
-            </select>
+              <option>سكري</option>
+              <option>زيتي</option>
+              <option>منت جرين</option>
+              <option>بترولي</option>
+              <option>هافان</option>
+              <option>بني فاتح</option>
+              <option>بني غامق</option>
+              <option>نبيتي</option>
+              <option>سماوي</option>
+          </select>
           </div>
           <div class="form-group" style="margin:0">
             <label class="form-label">المقاس</label>
             <select id="fSize" class="form-control" onchange="applyFilters()">
               <option value="الكل">الكل</option>
-              <option>46</option><option>48</option><option>50</option>
-              <option>52</option><option>54</option><option>56</option>
-            </select>
+              <option>20</option>
+              <option>22</option>
+              <option>24</option>
+              <option>26</option>
+              <option>28</option>
+              <option>30</option>
+              <option>32</option>
+              <option>34</option>
+              <option>36</option>
+              <option>38</option>
+              <option>40</option>
+              <option>42</option>
+              <option>44</option>
+              <option>46</option>
+              <option>48</option>
+              <option>50</option>
+              <option>52</option>
+              <option>54</option>
+              <option>56</option>
+              <option>58</option>
+              <option>60</option>
+              <option>62</option>
+          </select>
           </div>
           <div class="form-group" style="margin:0">
             <label class="form-label">الحالة</label>
@@ -124,6 +154,7 @@
           <table>
             <thead>
               <tr>
+                <th>الصورة</th>
                 <th>الكود</th>
                 <th>النوع</th>
                 <th>الأجزاء</th>
@@ -166,9 +197,8 @@
           <select id="mType" class="form-control">
             <option value="">اختر النوع</option>
             <option>كلاسيك</option>
-            <option>سهرة</option>
-            <option>عريس</option>
-            <option>قفطان</option>
+            <option>فورمال</option>
+            <option>سوارية</option>
           </select>
           <div class="field-error" id="errType">يرجى اختيار النوع</div>
         </div>
@@ -189,9 +219,29 @@
           <label class="form-label">المقاس <span class="required">*</span></label>
           <select id="mSize" class="form-control">
             <option value="">اختر المقاس</option>
-            <option>46</option><option>48</option><option>50</option>
-            <option>52</option><option>54</option><option>56</option>
-          </select>
+            <option>20</option>
+            <option>22</option>
+            <option>24</option>
+            <option>26</option>
+            <option>28</option>
+            <option>30</option>
+            <option>32</option>
+            <option>34</option>
+            <option>36</option>
+            <option>38</option>
+            <option>40</option>
+            <option>42</option>
+            <option>44</option>
+            <option>46</option>
+            <option>48</option>
+            <option>50</option>
+            <option>52</option>
+            <option>54</option>
+            <option>56</option>
+            <option>58</option>
+            <option>60</option>
+            <option>62</option>
+        </select>
           <div class="field-error" id="errSize">يرجى اختيار المقاس</div>
         </div>
       </div>
@@ -203,8 +253,18 @@
           <option>أسود</option>
           <option>كحلي</option>
           <option>رمادي</option>
+          <option>رصاصي</option>
           <option>بيج</option>
           <option>أبيض</option>
+          <option>سكري</option>
+          <option>زيتي</option>
+          <option>منت جرين</option>
+          <option>بترولي</option>
+          <option>هافان</option>
+          <option>بني فاتح</option>
+          <option>بني غامق</option>
+          <option>نبيتي</option>
+          <option>سماوي</option>
           <option value="أخرى">أخرى...</option>
         </select>
         <div class="field-error" id="errColor">يرجى اختيار اللون</div>
@@ -390,7 +450,7 @@ function openEditModal(suit_id) {
   document.getElementById('mParts').value = suit.suit_parts;
   document.getElementById('mSize').value = suit.size;
 
-  const knownColors = ['أسود','كحلي','رمادي','بيج','أبيض'];
+  const knownColors = ['أسود','كحلي','رمادي','رصاصي','بيج','أبيض','سكري','زيتي','منت جرين','بترولي','هافان','بني فاتح','بني غامق','نبيتي','سماوي'];
   if (knownColors.includes(suit.color)) {
     document.getElementById('mColor').value = suit.color;
     document.getElementById('otherColorGroup').style.display = 'none';

@@ -78,8 +78,8 @@
                 <label class="form-label">النوع</label>
                 <select id="sType" class="form-control">
                   <option value="">الكل</option>
-                  <option>كلاسيك</option><option>سهرة</option>
-                  <option>عريس</option><option>قفطان</option>
+                  <option>كلاسيك</option><option>فورمال</option>
+                  <option>سوارية</option>
                 </select>
               </div>
               <div class="form-group" style="margin:0">
@@ -96,15 +96,20 @@
                 <select id="sColor" class="form-control">
                   <option value="">الكل</option>
                   <option>أسود</option><option>كحلي</option>
-                  <option>رمادي</option><option>بيج</option><option>أبيض</option>
+                  <option>رمادي</option><option>رصاصي</option>
+                  <option>بيج</option><option>أبيض</option>
+                  <option>سكري</option><option>زيتي</option>
+                  <option>منت جرين</option><option>بترولي</option>
+                  <option>هافان</option><option>بني فاتح</option>
+                  <option>بني غامق</option><option>نبيتي</option>
+                  <option>سماوي</option>
                 </select>
               </div>
               <div class="form-group" style="margin:0">
                 <label class="form-label">المقاس</label>
                 <select id="sSize" class="form-control">
                   <option value="">الكل</option>
-                  <option>46</option><option>48</option><option>50</option>
-                  <option>52</option><option>54</option><option>56</option>
+                  <option>20</option>                  <option>22</option>                  <option>24</option>                  <option>26</option>                  <option>28</option>                  <option>30</option>                  <option>32</option>                  <option>34</option>                  <option>36</option>                  <option>38</option>                  <option>40</option>                  <option>42</option>                  <option>44</option>                  <option>46</option>                  <option>48</option>                  <option>50</option>                  <option>52</option>                  <option>54</option>                  <option>56</option>                  <option>58</option>                  <option>60</option>                  <option>62</option>
                 </select>
               </div>
             </div>
@@ -173,8 +178,29 @@
           </div>
           <div class="form-group">
             <label class="form-label">رقم البطاقة القومية <span class="required">*</span></label>
-            <input type="text" id="nationalId" class="form-control" placeholder="14 رقم" maxlength="14" style="direction:ltr;text-align:right">
-            <div class="field-error" id="errNationalId">رقم البطاقة يجب أن يكون 14 رقم</div>
+            <input type="text" id="nationalId" class="form-control" placeholder="14 رقم (اختياري إذا تم رفع صورة البطاقة)" maxlength="14" style="direction:ltr;text-align:right">
+            <div class="field-error" id="errNationalId">يجب إدخال رقم البطاقة (14 رقم) أو رفع صورة البطاقة</div>
+
+            <!-- صورة البطاقة القومية -->
+            <div style="margin-top:10px">
+              <label class="form-label" style="font-size:13px;color:var(--gray-600)">📷 صورة البطاقة القومية <span style="font-size:11px;color:var(--gray-500)">(اختياري — بجانب أو بدل الرقم)</span></label>
+              <div id="idImgUploadArea" onclick="document.getElementById('nationalIdImage').click()"
+                style="border:2px dashed var(--gray-300);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50)"
+                onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(201,168,76,0.04)'"
+                onmouseout="this.style.borderColor='var(--gray-300)';this.style.background='var(--gray-50)'">
+                <div id="idImgPreviewWrap" style="display:none;margin-bottom:8px;position:relative">
+                  <img id="idImgPreview" style="max-height:130px;max-width:100%;border-radius:8px;object-fit:contain;border:2px solid var(--accent)">
+                  <button type="button" onclick="event.stopPropagation();removeIdImage()"
+                    style="position:absolute;top:-8px;left:-8px;width:24px;height:24px;border-radius:50%;background:var(--danger);color:#fff;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3)">×</button>
+                </div>
+                <div id="idImgPlaceholder">
+                  <div style="font-size:24px;margin-bottom:4px">🪪</div>
+                  <div style="color:var(--gray-500);font-size:12px">اضغط لرفع صورة البطاقة القومية</div>
+                  <div style="color:var(--gray-400);font-size:11px;margin-top:2px">JPG / PNG / WEBP — حد أقصى 3MB</div>
+                </div>
+              </div>
+              <input type="file" id="nationalIdImage" accept="image/*" style="display:none" onchange="previewIdImage(event)">
+            </div>
           </div>
         </div>
       </div>
@@ -426,8 +452,10 @@ async function confirmRental() {
   // العنوان
   valid = validate('tenantAddress', !!tenantAddress, 'errTenantAddress') && valid;
 
-  // البطاقة القومية
-  valid = validate('nationalId', /^\d{14}$/.test(nationalId), 'errNationalId') && valid;
+  // البطاقة القومية — رقم أو صورة (أحدهما كافٍ)
+  const hasIdNumber = /^\d{14}$/.test(nationalId);
+  const hasIdImage = document.getElementById('nationalIdImage').files.length > 0;
+  valid = validate('nationalId', hasIdNumber || hasIdImage, 'errNationalId') && valid;
 
   // تاريخ الخروج
   valid = validate('checkoutDate', !!checkoutDate, 'errCheckout') && valid;
@@ -462,6 +490,19 @@ async function confirmRental() {
     const user = Auth.getCurrentUser();
     const rental_id = await generateRentalId();
 
+    // رفع صورة البطاقة إذا وُجدت
+    let national_id_img = '';
+    const idImageFile = document.getElementById('nationalIdImage').files[0];
+    if (idImageFile) {
+      btn.innerHTML = '<span class="loading-spinner"></span> جاري رفع صورة البطاقة...';
+      try {
+        national_id_img = await uploadToImgBB(idImageFile);
+      } catch (imgErr) {
+        showToast('⚠️ فشل رفع صورة البطاقة: ' + imgErr.message, 'warning');
+        // نكمل بدون الصورة
+      }
+    }
+
     const rentalData = {
       rental_id,
       suit_id: selectedSuit.suit_id,
@@ -473,6 +514,7 @@ async function confirmRental() {
       tenant_phone: tenantPhone,
       tenant_address: tenantAddress,
       national_id: nationalId,
+      national_id_img: national_id_img,
       checkout_date: checkoutDate,
       expected_return: expectedReturn,
       actual_return: '',
@@ -518,6 +560,7 @@ function validate(fieldId, condition, errId) {
 
 function resetForm() {
   clearSelectedSuit();
+  removeIdImage();
   ['tenantName','tenantPhone','tenantAddress','nationalId',
    'rentalPrice','depositAmount','notes','directCode'].forEach(id => {
     const el = document.getElementById(id);

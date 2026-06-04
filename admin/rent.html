@@ -284,11 +284,11 @@ async function loadFiltersFromSheet() {
     loadingMsg.style.display = 'none';
     container.style.display = 'block';
     document.getElementById('suitsCountBadge').textContent =
-      suits.length ? `(${suits.length} بدلة متاحة في الشيت)` : '(لا توجد بدل متاحة حالياً)';
+      suits.length ? `(${suits.length} بدلة متاحة في المخزون)` : '(لا توجد بدل متاحة حالياً)';
   } catch (err) {
     loadingMsg.style.display = 'none';
     errMsg.style.display = 'block';
-    errMsg.textContent = '❌ فشل تحميل البدل من الشيت: ' + err.message +
+    errMsg.textContent = '❌ فشل تحميل البدل من المخزون: ' + err.message +
       ' — تحقق من APPS_SCRIPT_URL في sheets.js';
     container.style.display = 'block';
   }
@@ -331,7 +331,7 @@ function renderSuitsTable(results) {
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requireEmployee()) return;
 
-  // تحميل الفلاتر ديناميكياً من الشيت
+  // تحميل الفلاتر ديناميكياً من المخزون
   loadFiltersFromSheet();
 
   // تعيين تاريخ اليوم كافتراضي

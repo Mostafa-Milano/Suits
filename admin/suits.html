@@ -396,14 +396,13 @@ function renderTable(suits) {
   tbody.innerHTML = suits.map(s => {
     const img = s.image_url || '';
     const imgCell = img
-      ? `<div class="suit-img-wrap" onclick="openImgViewer('${img}','${s.suit_id}',${JSON.stringify(s)})">
-           <img src="${img}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent);display:block;transition:transform .15s" 
+      ? `<div class="suit-img-wrap" data-suit-id="${s.suit_id}" onclick="openImgViewerById(this)">
+           <img src="${img}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent);display:block;transition:transform .15s"
              onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
            <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px">🔍</div>
          </div>`
-      : `<div class="suit-img-wrap" onclick="openImgViewer(null,'${s.suit_id}',${JSON.stringify(s)})">
-           <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--gray-100),var(--gray-200));display:flex;align-items:center;justify-content:center;font-size:26px;border:2px dashed var(--border);cursor:pointer;transition:transform .15s"
-             onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">👔</div>
+      : `<div class="suit-img-wrap" data-suit-id="${s.suit_id}" onclick="openImgViewerById(this)">
+           <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--gray-100),var(--gray-200));display:flex;align-items:center;justify-content:center;font-size:26px;border:2px dashed var(--border);cursor:pointer;transition:transform .15s">👔</div>
            <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.4);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px">🔍</div>
          </div>`;
     return `
@@ -666,6 +665,13 @@ function removeImage() {
   document.getElementById('imgPreviewWrap').style.display = 'none';
   document.getElementById('imgPlaceholder').style.display = 'block';
   document.getElementById('removeImgBtn').style.display = 'none';
+}
+
+function openImgViewerById(el) {
+  const suitId = el.getAttribute('data-suit-id');
+  const suit = allSuits.find(s => s.suit_id === suitId);
+  if (!suit) return;
+  openImgViewer(suit.image_url || null, suitId, suit);
 }
 
 function openImgViewer(src, suitId, suit) {

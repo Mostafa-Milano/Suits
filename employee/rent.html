@@ -71,7 +71,7 @@
                 <table class="radio-table">
                   <thead>
                     <tr>
-                      <th>اختر</th><th>الكود</th><th>النوع</th>
+                      <th>اختر</th><th>الصورة</th><th>الكود</th><th>النوع</th>
                       <th>الأجزاء</th><th>اللون</th><th>المقاس</th>
                     </tr>
                   </thead>
@@ -273,11 +273,17 @@ function renderSuitsTable(results) {
   const container = document.getElementById('searchResults');
   const tbody = document.getElementById('searchResultsBody');
   if (!results.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة للبحث</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة للبحث</td></tr>';
   } else {
     tbody.innerHTML = results.map(s => `
       <tr onclick="selectSuitFromTable('${s.suit_id}')" id="row-${s.suit_id}" style="cursor:pointer">
         <td><input type="radio" name="suitPick" value="${s.suit_id}" onchange="selectSuitFromTable('${s.suit_id}')"></td>
+        <td style="padding:6px">
+          ${s.image_url
+            ? `<img src="${s.image_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:2px solid var(--accent);display:block;cursor:zoom-in" onclick="event.stopPropagation();openSuitImgPreview('${s.image_url}','${s.suit_id}')" title="اضغط لتكبير الصورة">`
+            : `<div style="width:48px;height:48px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px dashed var(--border)">👔</div>`
+          }
+        </td>
         <td><strong>${s.suit_id}</strong></td>
         <td>${s.suit_type}</td>
         <td>${s.suit_parts}</td>

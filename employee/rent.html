@@ -139,44 +139,9 @@
           </div>
           <div class="form-group">
             <label class="form-label">رقم البطاقة القومية <span class="required">*</span></label>
-            <input type="text" id="nationalId" class="form-control" placeholder="14 رقم (اختياري إذا رفعت صورة البطاقة)" maxlength="14" style="direction:ltr;text-align:right">
-            <div class="field-error" id="errNationalId">يجب إدخال رقم البطاقة (14 رقم) أو رفع صورة البطاقة</div>
+            <input type="text" id="nationalId" class="form-control" placeholder="أدخل 14 رقم" maxlength="14" style="direction:ltr;text-align:right">
+            <div class="field-error" id="errNationalId">يجب إدخال رقم البطاقة (14 رقم)</div>
           </div>
-        </div>
-
-        <!-- صورة البطاقة القومية — صف مستقل -->
-        <div class="form-group" style="margin-top:4px">
-          <label class="form-label">
-            🪪 صورة البطاقة القومية
-            <span style="font-weight:400;font-size:12px;color:var(--gray-500);margin-right:6px">(اختياري — بجانب الرقم أو بدله)</span>
-          </label>
-          <div id="idImgUploadArea"
-            onclick="document.getElementById('nationalIdImage').click()"
-            style="border:2px dashed #ced4da;border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .2s, background .2s;background:#f8f9fa;"
-            onmouseover="this.style.borderColor='#c9a84c';this.style.background='rgba(201,168,76,0.05)'"
-            onmouseout="this.style.borderColor='#ced4da';this.style.background='#f8f9fa'">
-
-            <!-- معاينة الصورة بعد الرفع -->
-            <div id="idImgPreviewWrap" style="display:none;margin-bottom:12px">
-              <img id="idImgPreview"
-                style="max-height:160px;max-width:100%;border-radius:10px;object-fit:contain;border:2px solid #c9a84c;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
-              <div style="margin-top:10px">
-                <button type="button"
-                  onclick="event.stopPropagation();removeIdImage()"
-                  style="background:#dc3545;color:#fff;border:none;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:13px;font-family:inherit">
-                  🗑️ إزالة الصورة
-                </button>
-              </div>
-            </div>
-
-            <!-- Placeholder قبل الرفع -->
-            <div id="idImgPlaceholder">
-              <div style="font-size:36px;margin-bottom:8px">🪪</div>
-              <div style="color:#6c757d;font-size:14px;font-weight:600">اضغط لرفع صورة البطاقة القومية</div>
-              <div style="color:#adb5bd;font-size:12px;margin-top:6px">JPG / PNG / WEBP — الحد الأقصى 3MB</div>
-            </div>
-          </div>
-          <input type="file" id="nationalIdImage" accept="image/*" style="display:none" onchange="previewIdImage(event)">
         </div>
       </div>
     </div>
@@ -442,10 +407,9 @@ async function confirmRental() {
   // العنوان
   valid = validate('tenantAddress', !!tenantAddress, 'errTenantAddress') && valid;
 
-  // البطاقة القومية — رقم أو صورة (أحدهما كافٍ)
+  // البطاقة القومية — رقم فقط
   const hasIdNumber = /^\d{14}$/.test(nationalId);
-  const hasIdImage = document.getElementById('nationalIdImage').files.length > 0;
-  valid = validate('nationalId', hasIdNumber || hasIdImage, 'errNationalId') && valid;
+  valid = validate('nationalId', hasIdNumber, 'errNationalId') && valid;
 
   // تاريخ الخروج
   valid = validate('checkoutDate', !!checkoutDate, 'errCheckout') && valid;
@@ -480,18 +444,8 @@ async function confirmRental() {
     const user = Auth.getCurrentUser();
     const rental_id = await generateRentalId();
 
-    // رفع صورة البطاقة إذا وُجدت
+    // لا يوجد رفع صورة بطاقة
     let national_id_img = '';
-    const idImageFile = document.getElementById('nationalIdImage').files[0];
-    if (idImageFile) {
-      btn.innerHTML = '<span class="loading-spinner"></span> جاري رفع صورة البطاقة...';
-      try {
-        national_id_img = await uploadToImgBB(idImageFile);
-      } catch (imgErr) {
-        showToast('⚠️ فشل رفع صورة البطاقة: ' + imgErr.message, 'warning');
-        // نكمل بدون الصورة
-      }
-    }
 
     const rentalData = {
       rental_id,
@@ -550,7 +504,6 @@ function validate(fieldId, condition, errId) {
 
 function resetForm() {
   clearSelectedSuit();
-  removeIdImage();
   ['tenantName','tenantPhone','tenantAddress','nationalId',
    'rentalPrice','depositAmount','notes','directCode'].forEach(id => {
     const el = document.getElementById(id);
@@ -582,29 +535,6 @@ function openImgViewerSrc(src, suitId) {
 
 function closeImgViewer() {
   document.getElementById('imgViewerModal').style.display = 'none';
-}
-
-function previewIdImage(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  if (file.size > 3 * 1024 * 1024) {
-    showToast('حجم الصورة كبير جداً — الحد الأقصى 3MB', 'danger');
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('idImgPreview').src = e.target.result;
-    document.getElementById('idImgPreviewWrap').style.display = 'block';
-    document.getElementById('idImgPlaceholder').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeIdImage() {
-  document.getElementById('nationalIdImage').value = '';
-  document.getElementById('idImgPreview').src = '';
-  document.getElementById('idImgPreviewWrap').style.display = 'none';
-  document.getElementById('idImgPlaceholder').style.display = 'block';
 }
 
 </script>

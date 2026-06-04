@@ -130,9 +130,7 @@ function today() {
   const y = cairoDate.getFullYear();
   const m = String(cairoDate.getMonth() + 1).padStart(2, '0');
   const d = String(cairoDate.getDate()).padStart(2, '0');
-  const h = String(cairoDate.getHours()).padStart(2, '0');
-  const min = String(cairoDate.getMinutes()).padStart(2, '0');
-  return `${y}-${m}-${d} ${h}:${min}`;
+  return `${y}-${m}-${d}`;
 }
 
 // حساب عدد أيام التأخير

@@ -167,6 +167,97 @@
 <script src="../assets/js/alerts.js"></script>
 
 
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.requireAdmin()) return;
+  Auth.fillUserInfo();
+
+  // عرض التاريخ
+  const now = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('ar-EG', options);
+
+  await loadDashboard();
+});
+
+async function loadDashboard() {
+  try {
+    const [suits, rentals] = await Promise.all([getAllSuits(), getAllRentals()]);
+    const todayStr = today();
+    const thisMonth = todayStr.substring(0, 7);
+
+    // الإحصاءات
+    const available = suits.filter(s => s.status === 'متاحة').length;
+    const rented    = suits.filter(s => s.status === 'مؤجَّرة').length;
+    const late      = rentals.filter(r => r.status === 'مؤجَّرة' && r.expected_return && r.expected_return < todayStr).length;
+    const thisMonthCount = rentals.filter(r => r.checkout_date && r.checkout_date.startsWith(thisMonth)).length;
+
+    document.getElementById('statAvailable').textContent = available;
+    document.getElementById('statRented').textContent    = rented;
+    document.getElementById('statLate').textContent      = late;
+    document.getElementById('statMonth').textContent     = thisMonthCount;
+
+    // استلامات اليوم (مستحقة اليوم أو متأخرة)
+    const todayReturns = rentals.filter(r =>
+      r.status === 'مؤجَّرة' && r.expected_return && r.expected_return <= todayStr
+    ).sort((a, b) => a.expected_return.localeCompare(b.expected_return));
+
+    const tbody = document.getElementById('todayReturnsBody');
+    if (!todayReturns.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:24px">✅ لا توجد استلامات مجدولة اليوم</td></tr>';
+    } else {
+      tbody.innerHTML = todayReturns.map(r => {
+        const isLate = r.expected_return < todayStr;
+        const badge = isLate
+          ? `<span class="badge badge-danger">متأخر ${daysLate(r.expected_return)} يوم</span>`
+          : `<span class="badge badge-warning">اليوم</span>`;
+        return `<tr>
+          <td><strong>${r.suit_id}</strong></td>
+          <td>${r.tenant_name}</td>
+          <td style="direction:ltr;text-align:right">${r.tenant_phone}</td>
+          <td>${r.expected_return}</td>
+          <td>${r.rented_by}</td>
+          <td>${badge}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // آخر 5 عمليات تأجير
+    const recent = [...rentals]
+      .sort((a, b) => (b.checkout_date || '').localeCompare(a.checkout_date || ''))
+      .slice(0, 5);
+
+    const recentBody = document.getElementById('recentBody');
+    if (!recent.length) {
+      recentBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:32px">لا توجد عمليات تأجير بعد</td></tr>';
+    } else {
+      recentBody.innerHTML = recent.map(r => {
+        const statusBadge = r.status === 'مؤجَّرة'
+          ? '<span class="badge badge-warning">🔒 مؤجَّرة</span>'
+          : '<span class="badge badge-success">✅ مُرتجعة</span>';
+        return `<tr>
+          <td><strong>${r.suit_id}</strong></td>
+          <td>${r.tenant_name}</td>
+          <td>${r.checkout_date}</td>
+          <td>${r.expected_return}</td>
+          <td>${r.rented_by}</td>
+          <td>${statusBadge}</td>
+        </tr>`;
+      }).join('');
+    }
+
+  } catch (err) {
+    document.getElementById('statAvailable').textContent = '!';
+    document.getElementById('statRented').textContent    = '!';
+    document.getElementById('statLate').textContent      = '!';
+    document.getElementById('statMonth').textContent     = '!';
+    document.getElementById('todayReturnsBody').innerHTML =
+      '<tr><td colspan="6" class="text-center" style="color:var(--danger);padding:24px">⚠️ فشل تحميل البيانات — تحقق من إعدادات الاتصال</td></tr>';
+  }
+}
+</script>
+
 <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>

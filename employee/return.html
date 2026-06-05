@@ -140,7 +140,7 @@ let searchMode = 'suit';
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requireEmployee()) return;
 
-  document.getElementById('actualReturn').value = today();
+  document.getElementById('actualReturn').value = todayISO();
 
   // toggle label للتأمين
   document.getElementById('depositReturned').addEventListener('change', function() {
@@ -320,7 +320,7 @@ async function confirmReturn() {
       document.getElementById('returnNotes').value = '';
       document.getElementById('depositReturned').checked = false;
       document.getElementById('depositToggleLabel').textContent = 'لا';
-      document.getElementById('actualReturn').value = today();
+      document.getElementById('actualReturn').value = todayISO();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       showToast(result.message || 'حدث خطأ أثناء الحفظ', 'danger');

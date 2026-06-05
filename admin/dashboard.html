@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadDashboard() {
   try {
     const [suits, rentals] = await Promise.all([getAllSuits(), getAllRentals()]);
-    const todayStr = today();
+    const todayStr = todayISO();
     const thisMonth = todayStr.substring(0, 7);
 
     // الإحصاءات

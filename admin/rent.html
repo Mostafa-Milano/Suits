@@ -330,7 +330,7 @@ let allAvailableSuits = [];
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.requireEmployee()) return;
   Auth.fillUserInfo();
-  const todayStr = today();
+  const todayStr = todayISO();
   document.getElementById('checkoutDate').value = todayStr;
   document.getElementById('checkoutDate').min = todayStr;
   document.getElementById('checkoutDate').addEventListener('change', () => {
@@ -637,7 +637,7 @@ function resetForm() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  document.getElementById('checkoutDate').value = today();
+  document.getElementById('checkoutDate').value = todayISO();
   document.getElementById('expectedReturn').value = '';
   ['searchResults1','searchResults2'].forEach(id => {
     const el = document.getElementById(id);

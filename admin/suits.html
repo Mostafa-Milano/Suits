@@ -319,17 +319,27 @@ let allSuits = [];
 let editMode = false;
 
 // ── رفع الصور على imgBB ──
-const IMGBB_API_KEY = 'YOUR_IMGBB_API_KEY'; // ← ضع مفتاح imgBB هنا
+const IMGBB_API_KEY = 'c84815e518250c59f95a550da8a2d47e';
 
 async function uploadToImgBB(file) {
+  // تحويل الصورة إلى base64 أولاً (مطلوب من imgBB)
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = () => reject(new Error('فشل قراءة الصورة'));
+    reader.readAsDataURL(file);
+  });
+
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('image', base64);
   formData.append('key', IMGBB_API_KEY);
+
   const res = await fetch('https://api.imgbb.com/1/upload', {
     method: 'POST',
     body: formData
   });
-  if (!res.ok) throw new Error('فشل رفع الصورة على imgBB');
+
+  if (!res.ok) throw new Error(`فشل رفع الصورة — كود الخطأ: ${res.status}`);
   const data = await res.json();
   if (!data.success) throw new Error(data.error?.message || 'خطأ في imgBB');
   return data.data.url; // رابط الصورة الدائم

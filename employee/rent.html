@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requireEmployee()) return;
 
   // تعيين تاريخ اليوم كافتراضي
-  const todayStr = today();
+  const todayStr = todayISO();
   document.getElementById('checkoutDate').value = todayStr;
   document.getElementById('checkoutDate').min = todayStr;
 
@@ -526,7 +526,7 @@ function resetForm() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  document.getElementById('checkoutDate').value = today();
+  document.getElementById('checkoutDate').value = todayISO();
   document.getElementById('expectedReturn').value = '';
   document.getElementById('searchResults').style.display = 'none';
   document.getElementById('directCodeResult').innerHTML = '';

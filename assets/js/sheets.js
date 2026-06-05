@@ -12,7 +12,7 @@
 const SHEETS_CONFIG = {
   SPREADSHEET_ID: '1TxcWaqID-94Cv3ZANSJ3vqXRVR8hfKKwN4z6MI_AU0E',
   API_KEY: '',
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxq0qMVUICwLiKuRFkHwkBfOrO0bttbNDKmehZkoJbyV2BllkOIheDp76amwqeDbE96MA/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2XOQRBzx4yfuRK_338sxstXu7xyRCdYAp_EpxWTddHuG20ycDSMGXYDDhCpuZ76lV4Q/exec',
   BASE_URL: 'https://sheets.googleapis.com/v4/spreadsheets',
   SHEETS: {
     SUITS: 'suits',
@@ -123,9 +123,24 @@ function formatDate(dateStr) {
   return d.toISOString().split('T')[0];
 }
 
-// الحصول على اليوم
+// الحصول على التاريخ والوقت بتوقيت مصر
 function today() {
-  return new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const egyptDateTime = new Intl.DateTimeFormat('ar-EG', {
+    timeZone: 'Africa/Cairo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  }).format(now);
+  return egyptDateTime;
+}
+
+// دالة مساعدة لاستخراج التاريخ فقط (YYYY-MM-DD) للمقارنات الحسابية
+function todayISO() {
+  return new Date().toLocaleString('en-CA', { timeZone: 'Africa/Cairo' }).split(',')[0];
 }
 
 // حساب عدد أيام التأخير
@@ -212,7 +227,7 @@ async function returnRental(rental_id, returnData) {
 // 12. البدل المتأخرة
 async function getLateSuits() {
   const rentals = await getAllRentals();
-  const todayStr = today();
+  const todayStr = todayISO();
   return rentals
     .filter(r => {
       if (r.status !== 'مؤجَّرة') return false;
@@ -228,7 +243,7 @@ async function getLateSuits() {
 
 async function getDashboardStats() {
   const [suits, rentals] = await Promise.all([getAllSuits(), getAllRentals()]);
-  const todayStr = today();
+  const todayStr = todayISO();
   const thisMonth = todayStr.substring(0, 7);
 
   return {

@@ -12,7 +12,7 @@
 const SHEETS_CONFIG = {
   SPREADSHEET_ID: '1TxcWaqID-94Cv3ZANSJ3vqXRVR8hfKKwN4z6MI_AU0E',
   API_KEY: '',
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyTzR1LGFty8u_E7vX6MI5rkFcYSnmMZEtW6VEmLHdgan8CZZxOkxiGX0OOV-ovncWDag/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2XOQRBzx4yfuRK_338sxstXu7xyRCdYAp_EpxWTddHuG20ycDSMGXYDDhCpuZ76lV4Q/exec',
   BASE_URL: 'https://sheets.googleapis.com/v4/spreadsheets',
   SHEETS: {
     SUITS: 'suits',
@@ -120,17 +120,12 @@ function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d)) return dateStr;
-  return d.toLocaleDateString('ar-EG', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' });
+  return d.toISOString().split('T')[0];
 }
 
-// الحصول على اليوم بتوقيت مصر
+// الحصول على اليوم
 function today() {
-  const now = new Date();
-  const cairoDate = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));
-  const y = cairoDate.getFullYear();
-  const m = String(cairoDate.getMonth() + 1).padStart(2, '0');
-  const d = String(cairoDate.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return new Date().toISOString().split('T')[0];
 }
 
 // حساب عدد أيام التأخير
@@ -162,8 +157,7 @@ async function getAvailableSuits() {
 // 3. البحث عن بدلة بالكود
 async function getSuitById(suit_id) {
   const suits = await getAllSuits();
-  const normalizedId = String(suit_id).trim().toUpperCase();
-  return suits.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId) || null;
+  return suits.find(s => s.suit_id === suit_id) || null;
 }
 
 // 4. إضافة بدلة جديدة
@@ -176,7 +170,7 @@ async function updateSuitStatus(suit_id, newStatus) {
   return await postToScript('updateSuitStatus', { suit_id, status: newStatus });
 }
 
-// 6. تعديل بيانات قطعة
+// 6. تعديل بيانات بدلة كاملة
 async function updateSuit(suit_id, updatedData) {
   return await postToScript('updateSuit', { suit_id, ...updatedData });
 }

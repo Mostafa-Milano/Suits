@@ -2,17 +2,13 @@
 //  Google Apps Script — Milano Suits
 //  انسخ هذا الكود في Google Apps Script
 //  وانشره كـ Web App بصلاحيات "Anyone"
-//
-//  ملاحظة مهمة:
-//  - setupSheets() تُشغَّل مرة واحدة فقط عند الإنشاء الأول
-//  - updateScript() تُشغَّل عند تحديث الكود — لا تمس البيانات أبداً
 // ================================================
 
 const SPREADSHEET_ID = SpreadsheetApp.getActive().getId();
 
-const SUITS_COLS   = ['suit_id','suit_type','suit_parts','color','size','status','added_by','added_date','image_url'];
-const USERS_COLS   = ['username','password','role','name'];
-const RENTALS_COLS = [
+const SUITS_COLS    = ['suit_id','suit_type','suit_parts','color','size','status','added_by','added_date','image_url'];
+const USERS_COLS    = ['username','password','role','name'];
+const RENTALS_COLS  = [
   'rental_id','suit_id','suit_type','suit_parts','color','size',
   'tenant_name','tenant_phone','tenant_address','national_id',
   'checkout_date','expected_return','actual_return',
@@ -30,47 +26,53 @@ function corsOutput(data) {
 }
 
 // ============================
-//  GET
+//  GET — يدعم الاستدعاء عبر ?action=xxx&data={}
 // ============================
 function doGet(e) {
   try {
     const action = e.parameter.action || '';
     const data   = e.parameter.data ? JSON.parse(e.parameter.data) : {};
-    return corsOutput(handleAction(action, data));
+    const result = handleAction(action, data);
+    return corsOutput(result);
   } catch (err) {
     return corsOutput({ success: false, message: err.message });
   }
 }
 
 // ============================
-//  POST
+//  POST — يدعم body JSON
 // ============================
 function doPost(e) {
   try {
-    const body = JSON.parse(e.postData.contents);
-    return corsOutput(handleAction(body.action || '', body.data || {}));
+    const body   = JSON.parse(e.postData.contents);
+    const result = handleAction(body.action || '', body.data || {});
+    return corsOutput(result);
   } catch (err) {
     return corsOutput({ success: false, message: 'خطأ في الخادم: ' + err.message });
   }
 }
 
 // ============================
-//  Router
+//  Router مشترك
 // ============================
 function handleAction(action, data) {
   switch (action) {
+    // ── البدل ──
     case 'getSuits':         return getSuits();
     case 'addSuit':          return addSuit(data);
     case 'updateSuit':       return updateSuit(data);
     case 'deleteSuit':       return deleteSuit(data.suit_id);
     case 'updateSuitStatus': return updateSuitStatus(data.suit_id, data.status);
+    // ── التأجير ──
     case 'getRentals':       return getRentals();
     case 'addRental':        return addRental(data);
     case 'returnRental':     return returnRental(data);
+    // ── المستخدمون ──
     case 'getUsers':         return getUsers();
     case 'addUser':          return addUser(data);
     case 'updateUser':       return updateUser(data);
     case 'deleteUser':       return deleteUser(data.username);
+    // ── اختبار ──
     case 'ping':             return { success: true, message: 'pong' };
     default:
       return { success: false, message: 'إجراء غير معروف: ' + action };
@@ -86,9 +88,8 @@ function getUsersSheet()   { return SpreadsheetApp.openById(SPREADSHEET_ID).getS
 
 function findRow(sheet, colIndex, value) {
   const data = sheet.getDataRange().getValues();
-  const normalized = String(value).trim().toUpperCase();
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][colIndex]).trim().toUpperCase() === normalized) return i + 1;
+    if (String(data[i][colIndex]) === String(value)) return i + 1;
   }
   return -1;
 }
@@ -97,25 +98,23 @@ function findRow(sheet, colIndex, value) {
 //  البدل — Suits
 // ============================
 function getSuits() {
-  const data  = getSuitsSheet().getDataRange().getValues();
+  const data = getSuitsSheet().getDataRange().getValues();
   const suits = data.slice(1).filter(r => r[0]).map(r => ({
-    suit_id:    String(r[0] || '').trim(),
-    suit_type:  r[1] || '', suit_parts: r[2] || '',
-    color:      r[3] || '', size:       r[4] || '',
-    status:     r[5] || '', added_by:   r[6] || '',
-    added_date: r[7] || '', image_url:  r[8] || ''
+    suit_id:    r[0] || '', suit_type:  r[1] || '', suit_parts: r[2] || '',
+    color:      r[3] || '', size:       r[4] || '', status:     r[5] || '',
+    added_by:   r[6] || '', added_date: r[7] || '', image_url:  r[8] || ''
   }));
   return { success: true, suits };
 }
 
 function addSuit(data) {
   getSuitsSheet().appendRow(SUITS_COLS.map(c => data[c] || ''));
-  return { success: true, message: 'تمت إضافة القطعة بنجاح' };
+  return { success: true, message: 'تمت إضافة البدلة بنجاح' };
 }
 
 function updateSuit(data) {
   const row = findRow(getSuitsSheet(), 0, data.suit_id);
-  if (row === -1) return { success: false, message: 'القطعة غير موجودة' };
+  if (row === -1) return { success: false, message: 'البدلة غير موجودة' };
   const s = getSuitsSheet();
   s.getRange(row, 1).setValue(data.suit_id);
   s.getRange(row, 2).setValue(data.suit_type  || '');
@@ -123,31 +122,31 @@ function updateSuit(data) {
   s.getRange(row, 4).setValue(data.color      || '');
   s.getRange(row, 5).setValue(data.size       || '');
   if (typeof data.image_url !== 'undefined') s.getRange(row, 9).setValue(data.image_url || '');
-  return { success: true, message: 'تم تعديل القطعة بنجاح' };
+  return { success: true, message: 'تم تعديل البدلة بنجاح' };
 }
 
 function deleteSuit(suit_id) {
   const sheet = getSuitsSheet();
-  const row   = findRow(sheet, 0, suit_id);
-  if (row === -1) return { success: false, message: 'القطعة غير موجودة' };
+  const row = findRow(sheet, 0, suit_id);
+  if (row === -1) return { success: false, message: 'البدلة غير موجودة' };
   if (sheet.getRange(row, 6).getValue() === 'مؤجَّرة')
-    return { success: false, message: 'لا يمكن حذف قطعة مؤجَّرة' };
+    return { success: false, message: 'لا يمكن حذف بدلة مؤجَّرة' };
   sheet.deleteRow(row);
-  return { success: true, message: 'تم حذف القطعة بنجاح' };
+  return { success: true, message: 'تم حذف البدلة بنجاح' };
 }
 
 function updateSuitStatus(suit_id, status) {
   const row = findRow(getSuitsSheet(), 0, suit_id);
-  if (row === -1) return { success: false, message: 'القطعة غير موجودة' };
+  if (row === -1) return { success: false, message: 'البدلة غير موجودة' };
   getSuitsSheet().getRange(row, 6).setValue(status);
-  return { success: true, message: 'تم تحديث حالة القطعة' };
+  return { success: true, message: 'تم تحديث حالة البدلة' };
 }
 
 // ============================
 //  التأجير — Rentals
 // ============================
 function getRentals() {
-  const data    = getRentalsSheet().getDataRange().getValues();
+  const data = getRentalsSheet().getDataRange().getValues();
   const rentals = data.slice(1).filter(r => r[0]).map(r => ({
     rental_id: r[0]||'', suit_id: r[1]||'', suit_type: r[2]||'', suit_parts: r[3]||'',
     color: r[4]||'', size: r[5]||'', tenant_name: r[6]||'', tenant_phone: r[7]||'',
@@ -163,13 +162,13 @@ function addRental(data) {
   getRentalsSheet().appendRow(RENTALS_COLS.map(c => data[c] || ''));
   const suitResult = updateSuitStatus(data.suit_id, 'مؤجَّرة');
   if (!suitResult.success)
-    return { success: false, message: 'تم حفظ التأجير لكن فشل تحديث حالة القطعة' };
+    return { success: false, message: 'تم حفظ التأجير لكن فشل تحديث حالة البدلة' };
   return { success: true, message: 'تم تسجيل التأجير بنجاح' };
 }
 
 function returnRental(data) {
   const sheet = getRentalsSheet();
-  const row   = findRow(sheet, 0, data.rental_id);
+  const row = findRow(sheet, 0, data.rental_id);
   if (row === -1) return { success: false, message: 'العملية غير موجودة' };
   sheet.getRange(row, 13).setValue(data.actual_return    || '');
   sheet.getRange(row, 17).setValue(data.deposit_returned || 'لا');
@@ -179,7 +178,8 @@ function returnRental(data) {
     const existing = sheet.getRange(row, 21).getValue();
     sheet.getRange(row, 21).setValue(existing ? existing + ' | ' + data.notes : data.notes);
   }
-  updateSuitStatus(sheet.getRange(row, 2).getValue(), 'متاحة');
+  const suit_id = sheet.getRange(row, 2).getValue();
+  updateSuitStatus(suit_id, 'متاحة');
   return { success: true, message: 'تم تسجيل العودة بنجاح' };
 }
 
@@ -187,7 +187,7 @@ function returnRental(data) {
 //  المستخدمون — Users
 // ============================
 function getUsers() {
-  const data  = getUsersSheet().getDataRange().getValues();
+  const data = getUsersSheet().getDataRange().getValues();
   const users = data.slice(1).filter(r => r[0]).map(r => ({
     username: r[0]||'', password: r[1]||'', role: r[2]||'', name: r[3]||''
   }));
@@ -220,82 +220,37 @@ function deleteUser(username) {
   return { success: true, message: 'تم حذف المستخدم بنجاح' };
 }
 
-// ============================================================
-//  setupSheets — تُشغَّل مرة واحدة فقط عند إنشاء الشيت لأول مرة
-//  تنشئ الشيتات وترويساتها + مستخدم admin افتراضي
-//  ⚠️ لا تشغّلها مرة ثانية لأنها ستمسح البيانات الموجودة
-// ============================================================
+// ============================
+//  setupSheets — تشغيل مرة واحدة
+// ============================
 function setupSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  // ── users ──
+  // users
   let usersSheet = ss.getSheetByName('users') || ss.insertSheet('users');
   usersSheet.clearContents();
-  usersSheet.getRange(1, 1, 1, USERS_COLS.length).setValues([USERS_COLS]);
-  usersSheet.getRange(1, 1, 1, USERS_COLS.length)
-    .setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
-  usersSheet.appendRow(['admin', 'admin123', 'admin', 'صاحب المحل']);
+  usersSheet.getRange(1,1,1,USERS_COLS.length).setValues([USERS_COLS]);
+  usersSheet.getRange(1,1,1,USERS_COLS.length).setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
+  usersSheet.appendRow(['admin','admin123','admin','صاحب المحل']);
 
-  // ── suits ──
+  // suits
   let suitsSheet = ss.getSheetByName('suits') || ss.insertSheet('suits');
   suitsSheet.clearContents();
-  suitsSheet.getRange(1, 1, 1, SUITS_COLS.length).setValues([SUITS_COLS]);
-  suitsSheet.getRange(1, 1, 1, SUITS_COLS.length)
-    .setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
+  suitsSheet.getRange(1,1,1,SUITS_COLS.length).setValues([SUITS_COLS]);
+  suitsSheet.getRange(1,1,1,SUITS_COLS.length).setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
 
-  // ── rentals ──
+  // rentals
   let rentalsSheet = ss.getSheetByName('rentals') || ss.insertSheet('rentals');
   rentalsSheet.clearContents();
-  rentalsSheet.getRange(1, 1, 1, RENTALS_COLS.length).setValues([RENTALS_COLS]);
-  rentalsSheet.getRange(1, 1, 1, RENTALS_COLS.length)
-    .setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
+  rentalsSheet.getRange(1,1,1,RENTALS_COLS.length).setValues([RENTALS_COLS]);
+  rentalsSheet.getRange(1,1,1,RENTALS_COLS.length).setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
 
-  SpreadsheetApp.getUi().alert(
-    '✅ تم إنشاء الشيت بنجاح!\n\nبيانات الدخول الافتراضية:\nالمستخدم: admin\nكلمة المرور: admin123\n\nقم بتغيير كلمة المرور فور الدخول.'
-  );
-}
+  const today = new Date().toISOString().split('T')[0];
+  [
+    ['S-001','سهرة','كاملة','أسود','50','متاحة','admin',today,''],
+    ['S-002','عريس','كاملة','كحلي','52','متاحة','admin',today,''],
+    ['S-003','كلاسيك','كاملة','رمادي','48','متاحة','admin',today,''],
+  ].forEach(r => suitsSheet.appendRow(r));
 
-// ============================================================
-//  updateScript — تُشغَّل بعد كل تحديث للكود
-//  تتحقق فقط أن الأعمدة صحيحة وتضيف ما ينقص — لا تمس البيانات أبداً
-// ============================================================
-function updateScript() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  _ensureSheet(ss, 'suits',   SUITS_COLS);
-  _ensureSheet(ss, 'rentals', RENTALS_COLS);
-  _ensureSheet(ss, 'users',   USERS_COLS);
-
-  SpreadsheetApp.getUi().alert(
-    '✅ تم تحديث السكريبت بنجاح!\n\nجميع بياناتك محفوظة — لم يُمس شيء.'
-  );
-}
-
-// ── مساعد داخلي: يتأكد أن الشيت موجود وأن الـ header صحيح ──
-function _ensureSheet(ss, name, cols) {
-  let sheet = ss.getSheetByName(name);
-
-  // إذا الشيت غير موجود — أنشئه فارغاً بالـ header فقط
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    sheet.getRange(1, 1, 1, cols.length).setValues([cols]);
-    sheet.getRange(1, 1, 1, cols.length)
-      .setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
-    return;
-  }
-
-  // الشيت موجود — تحقق من الـ header فقط (السطر الأول)
-  const existingHeader = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const existingCols   = existingHeader.map(v => String(v).trim()).filter(v => v);
-
-  // إذا الـ header مختلف أو فارغ — أعد كتابة السطر الأول فقط (بدون مس البيانات)
-  if (existingCols.join(',') !== cols.join(',')) {
-    // توسيع عدد الأعمدة إن لزم
-    if (sheet.getLastColumn() < cols.length) {
-      sheet.insertColumnsAfter(sheet.getLastColumn(), cols.length - sheet.getLastColumn());
-    }
-    sheet.getRange(1, 1, 1, cols.length).setValues([cols]);
-    sheet.getRange(1, 1, 1, cols.length)
-      .setBackground('#1a1a2e').setFontColor('#c9a84c').setFontWeight('bold');
-  }
+  SpreadsheetApp.getUi().alert('✅ تم إعداد الشيت بنجاح!');
 }

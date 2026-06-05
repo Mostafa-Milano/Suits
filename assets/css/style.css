@@ -12,7 +12,6 @@
   --orange: #fd7e14;
   --light: #f8f9fa;
   --white: #ffffff;
-  --gray-50: #fdfdfe;
   --gray-100: #f8f9fa;
   --gray-200: #e9ecef;
   --gray-300: #dee2e6;
@@ -1495,7 +1494,7 @@ textarea.form-control {
   box-shadow: var(--shadow);
   border: 1px solid var(--gray-200);
   margin-bottom: 20px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .section-card-header {

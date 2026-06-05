@@ -176,7 +176,7 @@ async function updateSuitStatus(suit_id, newStatus) {
   return await postToScript('updateSuitStatus', { suit_id, status: newStatus });
 }
 
-// 6. تعديل بيانات بدلة كاملة
+// 6. تعديل بيانات قطعة
 async function updateSuit(suit_id, updatedData) {
   return await postToScript('updateSuit', { suit_id, ...updatedData });
 }

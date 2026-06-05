@@ -12,7 +12,7 @@
 const SHEETS_CONFIG = {
   SPREADSHEET_ID: '1TxcWaqID-94Cv3ZANSJ3vqXRVR8hfKKwN4z6MI_AU0E',
   API_KEY: '',
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyilAtJIrIcbYWl71jLQi4zkvNL6JWhVFfP6pW5bpxyzOCG4iV8P0VCwOvChxrm08ghZA/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyTzR1LGFty8u_E7vX6MI5rkFcYSnmMZEtW6VEmLHdgan8CZZxOkxiGX0OOV-ovncWDag/exec',
   BASE_URL: 'https://sheets.googleapis.com/v4/spreadsheets',
   SHEETS: {
     SUITS: 'suits',

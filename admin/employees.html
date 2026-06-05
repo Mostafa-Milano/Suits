@@ -134,7 +134,7 @@ async function loadEmployees() {
     allRentals = rentalsData;
     allUsers = (usersRes.users || []).filter(u => u.role === 'employee');
 
-    const todayStr = today();
+    const todayStr = todayISO();
     const thisMonth = todayStr.substring(0, 7);
 
     const tbody = document.getElementById('empSummaryBody');

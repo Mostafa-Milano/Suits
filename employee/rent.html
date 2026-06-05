@@ -19,114 +19,179 @@
 
   <div class="emp-content">
 
-    <!-- القسم 1: اختيار البدلة -->
+    <!-- القسم 1: اختيار القطع -->
     <div class="section-card">
       <div class="section-card-header">
-        <span>1️⃣</span> اختيار البدلة
+        <span>1️⃣</span> اختيار القطع المراد تأجيرها
       </div>
       <div class="section-card-body">
 
-        <div class="tabs-container" style="box-shadow:none;border:none">
-          <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchTab('search')">🔍 بحث من القائمة</button>
-            <button class="tab-btn" onclick="switchTab('code')">📝 إدخال الكود مباشرة</button>
-          </div>
+        <!-- القطعة الأولى -->
+        <div style="border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">
+          <div style="font-weight:700;color:var(--accent);margin-bottom:12px;font-size:15px">👔 القطعة الأولى <span class="required">*</span></div>
 
-          <!-- TAB 1: البحث -->
-          <div id="tab-search" class="tab-content active">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
-              <div class="form-group" style="margin:0">
-                <label class="form-label">النوع</label>
-                <select id="sType" class="form-control">
-                  <option value="">الكل</option>
-                  <option>كلاسيك</option>
-                  <option>فورمال</option><option>سوارية</option>
-                </select>
+          <div class="tabs-container" style="box-shadow:none;border:none">
+            <div class="tabs-nav">
+              <button class="tab-btn active" onclick="switchTab1('search')">🔍 بحث من القائمة</button>
+              <button class="tab-btn" onclick="switchTab1('code')">📝 إدخال الكود مباشرة</button>
+            </div>
+
+            <!-- TAB بحث - القطعة 1 -->
+            <div id="tab1-search" class="tab-content active">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">النوع</label>
+                  <select id="s1Type" class="form-control">
+                    <option value="">الكل</option>
+                    <option>كلاسيك</option><option>فورمال</option><option>سوارية</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">الأجزاء</label>
+                  <select id="s1Parts" class="form-control">
+                    <option value="">الكل</option>
+                    <option>بدلة كاملة</option><option>جاكيت</option>
+                    <option>بنطلون</option><option>سديري</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">اللون</label>
+                  <select id="s1Color" class="form-control">
+                    <option value="">الكل</option>
+                    <option>أسود</option><option>كحلي</option><option>رمادي</option><option>بيج</option>
+                    <option>سكري</option><option>زيتي</option><option>منت جرين</option><option>بترولي</option>
+                    <option>هافان</option><option>رصاصي</option><option>بني فاتح</option><option>بني غامق</option>
+                    <option>أبيض</option><option>نبيتي</option><option>سماوي</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">المقاس</label>
+                  <select id="s1Size" class="form-control">
+                    <option value="">الكل</option>
+                    <option>20</option><option>22</option><option>24</option><option>26</option><option>28</option>
+                    <option>30</option><option>32</option><option>34</option><option>36</option><option>38</option>
+                    <option>40</option><option>42</option><option>44</option><option>46</option><option>48</option>
+                    <option>50</option><option>52</option><option>54</option><option>56</option><option>58</option>
+                    <option>60</option><option>62</option>
+                  </select>
+                </div>
               </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">الأجزاء</label>
-                <select id="sParts" class="form-control">
-                  <option value="">الكل</option>
-                  <option>بدلة كاملة</option>
-                  <option>جاكيت</option>
-                  <option>بنطلون</option>
-                  <option>سديري</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">اللون</label>
-                <select id="sColor" class="form-control">
-                  <option value="">الكل</option>
-                  <option>أسود</option><option>كحلي</option><option>رمادي</option><option>بيج</option>
-                  <option>سكري</option><option>زيتي</option><option>منت جرين</option><option>بترولي</option>
-                  <option>هافان</option><option>رصاصي</option><option>بني فاتح</option><option>بني غامق</option>
-                  <option>أبيض</option><option>نبيتي</option><option>سماوي</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <label class="form-label">المقاس</label>
-                <select id="sSize" class="form-control">
-                  <option value="">الكل</option>
-                  <option>20</option>
-                  <option>22</option>
-                  <option>24</option>
-                  <option>26</option>
-                  <option>28</option>
-                  <option>30</option>
-                  <option>32</option>
-                  <option>34</option>
-                  <option>36</option>
-                  <option>38</option>
-                  <option>40</option>
-                  <option>42</option>
-                  <option>44</option>
-                  <option>46</option>
-                  <option>48</option>
-                  <option>50</option>
-                  <option>52</option>
-                  <option>54</option>
-                  <option>56</option>
-                  <option>58</option>
-                  <option>60</option>
-                  <option>62</option>
-                </select>
+              <button class="btn btn-primary" onclick="searchSuits1()">🔍 بحث</button>
+              <div id="searchResults1" style="margin-top:16px;display:none">
+                <div class="table-wrapper">
+                  <table class="radio-table">
+                    <thead><tr><th>اختر</th><th>الكود</th><th>النوع</th><th>الأجزاء</th><th>اللون</th><th>المقاس</th></tr></thead>
+                    <tbody id="searchResultsBody1"></tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <button class="btn btn-primary" onclick="searchSuits()">🔍 بحث</button>
 
-            <div id="searchResults" style="margin-top:16px;display:none">
-              <div class="table-wrapper">
-                <table class="radio-table">
-                  <thead>
-                    <tr>
-                      <th>اختر</th><th>الكود</th><th>النوع</th>
-                      <th>الأجزاء</th><th>اللون</th><th>المقاس</th>
-                    </tr>
-                  </thead>
-                  <tbody id="searchResultsBody"></tbody>
-                </table>
+            <!-- TAB كود - القطعة 1 -->
+            <div id="tab1-code" class="tab-content">
+              <div class="search-box">
+                <input type="text" id="directCode1" class="form-control" placeholder="مثال: S-001" style="font-size:16px;font-weight:600;letter-spacing:1px">
+                <button class="btn btn-primary" onclick="checkDirectCode1()">✅ تحقق</button>
               </div>
+              <div id="directCodeResult1" style="margin-top:12px"></div>
             </div>
           </div>
 
-          <!-- TAB 2: الكود المباشر -->
-          <div id="tab-code" class="tab-content">
-            <div class="search-box">
-              <input type="text" id="directCode" class="form-control"
-                placeholder="مثال: S-001"
-                style="font-size:16px;font-weight:600;letter-spacing:1px">
-              <button class="btn btn-primary" onclick="checkDirectCode()">✅ تحقق</button>
+          <!-- مربع تأكيد القطعة 1 -->
+          <div id="selectedSuit1Box" class="selected-suit-box" style="display:none;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px">
+            <span style="font-size:20px">✅</span>
+            <span id="selectedSuit1Text"></span>
+            <div id="selectedSuit1ImgWrap" style="display:none;margin-right:auto">
+              <img id="selectedSuit1Img" onclick="openImgViewerSrc(this.src, selectedSuit1 ? selectedSuit1.suit_id : '')" style="width:56px;height:56px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent)" title="اضغط لعرض الصورة">
             </div>
-            <div id="directCodeResult" style="margin-top:12px"></div>
+            <button onclick="clearSelectedSuit1()" style="margin-right:auto;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px">✕ إلغاء</button>
           </div>
         </div>
 
-        <!-- مربع تأكيد الاختيار -->
-        <div id="selectedSuitBox" class="selected-suit-box" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-          <span style="font-size:20px">✅</span>
-          <span id="selectedSuitText"></span>
-          <div id="selectedSuitImgWrap" style="display:none;margin-right:auto">
-            <img id="selectedSuitImg" onclick="openImgViewer()" style="width:64px;height:64px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.15)" title="اضغط لعرض الصورة كاملة">
+        <!-- القطعة الثانية (اختياري) -->
+        <div style="border:2px dashed var(--border);border-radius:12px;padding:16px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-weight:700;color:var(--text-muted);font-size:15px">👔 القطعة الثانية <span style="font-size:11px;font-weight:400">(اختياري)</span></div>
+            <button class="btn btn-outline btn-sm" id="togglePiece2Btn" onclick="togglePiece2()">➕ إضافة قطعة ثانية</button>
+          </div>
+
+          <div id="piece2Section" style="display:none">
+            <div class="tabs-container" style="box-shadow:none;border:none">
+              <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab2('search')">🔍 بحث من القائمة</button>
+                <button class="tab-btn" onclick="switchTab2('code')">📝 إدخال الكود مباشرة</button>
+              </div>
+
+              <!-- TAB بحث - القطعة 2 -->
+              <div id="tab2-search" class="tab-content active">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">النوع</label>
+                    <select id="s2Type" class="form-control">
+                      <option value="">الكل</option>
+                      <option>كلاسيك</option><option>فورمال</option><option>سوارية</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">الأجزاء</label>
+                    <select id="s2Parts" class="form-control">
+                      <option value="">الكل</option>
+                      <option>بدلة كاملة</option><option>جاكيت</option>
+                      <option>بنطلون</option><option>سديري</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">اللون</label>
+                    <select id="s2Color" class="form-control">
+                      <option value="">الكل</option>
+                      <option>أسود</option><option>كحلي</option><option>رمادي</option><option>بيج</option>
+                      <option>سكري</option><option>زيتي</option><option>منت جرين</option><option>بترولي</option>
+                      <option>هافان</option><option>رصاصي</option><option>بني فاتح</option><option>بني غامق</option>
+                      <option>أبيض</option><option>نبيتي</option><option>سماوي</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">المقاس</label>
+                    <select id="s2Size" class="form-control">
+                      <option value="">الكل</option>
+                      <option>20</option><option>22</option><option>24</option><option>26</option><option>28</option>
+                      <option>30</option><option>32</option><option>34</option><option>36</option><option>38</option>
+                      <option>40</option><option>42</option><option>44</option><option>46</option><option>48</option>
+                      <option>50</option><option>52</option><option>54</option><option>56</option><option>58</option>
+                      <option>60</option><option>62</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-primary" onclick="searchSuits2()">🔍 بحث</button>
+                <div id="searchResults2" style="margin-top:16px;display:none">
+                  <div class="table-wrapper">
+                    <table class="radio-table">
+                      <thead><tr><th>اختر</th><th>الكود</th><th>النوع</th><th>الأجزاء</th><th>اللون</th><th>المقاس</th></tr></thead>
+                      <tbody id="searchResultsBody2"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB كود - القطعة 2 -->
+              <div id="tab2-code" class="tab-content">
+                <div class="search-box">
+                  <input type="text" id="directCode2" class="form-control" placeholder="مثال: S-002" style="font-size:16px;font-weight:600;letter-spacing:1px">
+                  <button class="btn btn-primary" onclick="checkDirectCode2()">✅ تحقق</button>
+                </div>
+                <div id="directCodeResult2" style="margin-top:12px"></div>
+              </div>
+            </div>
+
+            <!-- مربع تأكيد القطعة 2 -->
+            <div id="selectedSuit2Box" class="selected-suit-box" style="display:none;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px">
+              <span style="font-size:20px">✅</span>
+              <span id="selectedSuit2Text"></span>
+              <div id="selectedSuit2ImgWrap" style="display:none;margin-right:auto">
+                <img id="selectedSuit2Img" onclick="openImgViewerSrc(this.src, selectedSuit2 ? selectedSuit2.suit_id : '')" style="width:56px;height:56px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent)" title="اضغط لعرض الصورة">
+              </div>
+              <button onclick="clearSelectedSuit2()" style="margin-right:auto;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px">✕ إلغاء</button>
+            </div>
           </div>
         </div>
 
@@ -187,14 +252,18 @@
     <div class="section-card">
       <div class="section-card-header"><span>4️⃣</span> البيانات المالية</div>
       <div class="section-card-body">
+        <!-- ملاحظة عند وجود قطعتين -->
+        <div id="priceSplitNote" style="display:none;background:var(--accent-light,#fef3c7);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--accent-dark,#92400e)">
+          💡 عند وجود قطعتين، سيتم تقسيم سعر الإيجار والتأمين بالتساوي بين البدلتين في السجل
+        </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">سعر الإيجار (جنيه) <span class="required">*</span></label>
+            <label class="form-label">سعر الإيجار الإجمالي (جنيه) <span class="required">*</span></label>
             <input type="number" id="rentalPrice" class="form-control" placeholder="0" min="0">
             <div class="field-error" id="errPrice">يرجى إدخال سعر الإيجار</div>
           </div>
           <div class="form-group">
-            <label class="form-label">مبلغ التأمين (جنيه) <span class="required">*</span></label>
+            <label class="form-label">مبلغ التأمين الإجمالي (جنيه) <span class="required">*</span></label>
             <input type="number" id="depositAmount" class="form-control" placeholder="0" min="0">
             <div class="field-error" id="errDeposit">يرجى إدخال مبلغ التأمين</div>
           </div>
@@ -243,7 +312,13 @@
 <script src="../assets/js/auth.js"></script>
 <script>
 
-let selectedSuit = null;
+// ========================
+//  State
+// ========================
+let selectedSuit1 = null;
+let selectedSuit2 = null;
+let piece2Visible = false;
+let suitsCache   = null;
 
 const SuitImages = {
   _key: 'milano_suit_images',
@@ -258,191 +333,272 @@ const SuitImages = {
   get(suit_id) { return this._load()[suit_id] || null; }
 };
 
+// ========================
+//  Init
+// ========================
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requireEmployee()) return;
-
-  // تعيين تاريخ اليوم كافتراضي
   const todayStr = todayISO();
   document.getElementById('checkoutDate').value = todayStr;
   document.getElementById('checkoutDate').min = todayStr;
-
-  // تقييد تاريخ العودة
   document.getElementById('checkoutDate').addEventListener('change', () => {
     document.getElementById('expectedReturn').min = document.getElementById('checkoutDate').value;
   });
 });
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', (i === 0 && tab === 'search') || (i === 1 && tab === 'code'));
-  });
-  document.getElementById('tab-search').classList.toggle('active', tab === 'search');
-  document.getElementById('tab-code').classList.toggle('active', tab === 'code');
-  clearSelectedSuit();
+// ========================
+//  القطعة الثانية toggle
+// ========================
+function togglePiece2() {
+  piece2Visible = !piece2Visible;
+  document.getElementById('piece2Section').style.display = piece2Visible ? 'block' : 'none';
+  const btn = document.getElementById('togglePiece2Btn');
+  btn.textContent = piece2Visible ? '✕ إلغاء القطعة الثانية' : '➕ إضافة قطعة ثانية';
+  if (!piece2Visible) clearSelectedSuit2();
+  // إظهار/إخفاء ملاحظة تقسيم السعر
+  document.getElementById('priceSplitNote').style.display = piece2Visible ? 'block' : 'none';
 }
 
-async function searchSuits() {
-  const filters = {
-    suit_type: document.getElementById('sType').value || 'الكل',
-    suit_parts: document.getElementById('sParts').value || 'الكل',
-    color: document.getElementById('sColor').value || 'الكل',
-    size: document.getElementById('sSize').value || 'الكل',
-    status: 'متاحة'
-  };
+// ========================
+//  Tab switching
+// ========================
+function switchTab1(tab) {
+  const btns = document.querySelectorAll('#tab1-search, #tab1-code');
+  document.getElementById('tab1-search').classList.toggle('active', tab === 'search');
+  document.getElementById('tab1-code').classList.toggle('active', tab === 'code');
+  // sync buttons
+  const navBtns = document.querySelectorAll('[onclick^="switchTab1"]');
+  navBtns[0].classList.toggle('active', tab === 'search');
+  navBtns[1].classList.toggle('active', tab === 'code');
+  clearSelectedSuit1();
+}
 
+function switchTab2(tab) {
+  document.getElementById('tab2-search').classList.toggle('active', tab === 'search');
+  document.getElementById('tab2-code').classList.toggle('active', tab === 'code');
+  const navBtns = document.querySelectorAll('[onclick^="switchTab2"]');
+  navBtns[0].classList.toggle('active', tab === 'search');
+  navBtns[1].classList.toggle('active', tab === 'code');
+  clearSelectedSuit2();
+}
+
+// ========================
+//  Fetch suits (cached)
+// ========================
+async function loadSuits() {
+  if (suitsCache) return suitsCache;
+  const available = await getAvailableSuits();
+  suitsCache = available;
+  return suitsCache;
+}
+
+function applyFilters(suits, typeId, partsId, colorId, sizeId) {
+  return filterSuits(suits, {
+    suit_type:  document.getElementById(typeId).value  || 'الكل',
+    suit_parts: document.getElementById(partsId).value || 'الكل',
+    color:      document.getElementById(colorId).value || 'الكل',
+    size:       document.getElementById(sizeId).value  || 'الكل',
+    status: 'متاحة'
+  });
+}
+
+// ========================
+//  Search suits 1
+// ========================
+async function searchSuits1() {
   showLoading('جاري البحث...');
   try {
-    const available = await getAvailableSuits();
-    const results = filterSuits(available, filters);
+    suitsCache = null; // refresh
+    const all = await loadSuits();
+    const results = applyFilters(all, 's1Type', 's1Parts', 's1Color', 's1Size');
     hideLoading();
-
-    const container = document.getElementById('searchResults');
-    const tbody = document.getElementById('searchResultsBody');
-
+    const tbody = document.getElementById('searchResultsBody1');
+    const container = document.getElementById('searchResults1');
     if (!results.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة للبحث</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة</td></tr>';
     } else {
       tbody.innerHTML = results.map(s => `
-        <tr onclick="selectSuitFromTable('${s.suit_id}')" id="row-${s.suit_id}" style="cursor:pointer">
-          <td><input type="radio" name="suitPick" value="${s.suit_id}" onchange="selectSuitFromTable('${s.suit_id}')"></td>
+        <tr onclick="selectSuit1FromTable('${s.suit_id}')" id="row1-${s.suit_id}" style="cursor:pointer">
+          <td><input type="radio" name="suit1Pick" value="${s.suit_id}"></td>
           <td><strong>${s.suit_id}</strong></td>
-          <td>${s.suit_type}</td>
-          <td>${s.suit_parts}</td>
-          <td>${s.color}</td>
+          <td>${s.suit_type}</td><td>${s.suit_parts}</td><td>${s.color}</td>
           <td><span class="badge badge-primary">${s.size}</span></td>
         </tr>
       `).join('');
     }
     container.style.display = 'block';
-    clearSelectedSuit();
-  } catch (err) {
-    hideLoading();
-    showToast('فشل تحميل البدل', 'danger');
-  }
+  } catch(e) { hideLoading(); showToast('فشل تحميل البدل', 'danger'); }
 }
 
-function selectSuitFromTable(suit_id) {
-  const radio = document.querySelector(`input[name="suitPick"][value="${suit_id}"]`);
+async function selectSuit1FromTable(suit_id) {
+  if (selectedSuit2 && selectedSuit2.suit_id === suit_id) {
+    showToast('هذا الكود مختار بالفعل في القطعة الثانية', 'warning'); return;
+  }
+  const radio = document.querySelector(`input[name="suit1Pick"][value="${suit_id}"]`);
   if (radio) radio.checked = true;
-
-  document.querySelectorAll('.radio-table tr').forEach(tr => tr.classList.remove('selected'));
-  const row = document.getElementById(`row-${suit_id}`);
+  document.querySelectorAll('#searchResultsBody1 tr').forEach(tr => tr.classList.remove('selected'));
+  const row = document.getElementById(`row1-${suit_id}`);
   if (row) row.classList.add('selected');
-
-  // البحث عن بيانات البدلة من النتائج
-  getAvailableSuits().then(suits => {
-    const suit = suits.find(s => s.suit_id === suit_id);
-    if (suit) setSelectedSuit(suit);
-  });
+  const suits = await loadSuits();
+  const suit = suits.find(s => s.suit_id === suit_id);
+  if (suit) setSelectedSuit1(suit);
 }
 
-async function checkDirectCode() {
-  const code = document.getElementById('directCode').value.trim().toUpperCase();
-  const resultDiv = document.getElementById('directCodeResult');
-
-  if (!code) {
-    resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ يرجى إدخال كود البدلة</div>';
-    return;
+async function checkDirectCode1() {
+  const code = document.getElementById('directCode1').value.trim().toUpperCase();
+  const resultDiv = document.getElementById('directCodeResult1');
+  if (!code) { resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ يرجى إدخال كود البدلة</div>'; return; }
+  if (selectedSuit2 && selectedSuit2.suit_id === code) {
+    resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ هذا الكود مختار بالفعل في القطعة الثانية</div>'; return;
   }
-
   showLoading('جاري التحقق...');
   try {
     const suit = await getSuitById(code);
     hideLoading();
-
     if (!suit) {
       resultDiv.innerHTML = '<div class="alert-banner alert-red">❌ الكود غير موجود في النظام</div>';
-      clearSelectedSuit();
+      clearSelectedSuit1();
     } else if (suit.status !== 'متاحة') {
-      const rentedImg = suit.image_url || '';
-      const imgHtml = rentedImg
-        ? `<div style="margin-top:10px;display:flex;align-items:center;gap:12px">
-            <img src="${rentedImg}" onclick="openImgViewerSrc('${rentedImg}','${code}')" style="width:72px;height:72px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid #f59e0b;box-shadow:0 2px 8px rgba(0,0,0,0.2)" title="اضغط لعرض صورة البدلة">
-            <span style="color:var(--text-muted);font-size:13px">👆 اضغط على الصورة لعرضها كاملة</span>
-           </div>` : '';
-      resultDiv.innerHTML = `<div class="alert-banner alert-red">🔒 البدلة <strong>${code}</strong> مؤجَّرة حالياً — غير متاحة${imgHtml}</div>`;
-      clearSelectedSuit();
+      resultDiv.innerHTML = `<div class="alert-banner alert-red">🔒 البدلة <strong>${code}</strong> مؤجَّرة حالياً — غير متاحة</div>`;
+      clearSelectedSuit1();
     } else {
-      resultDiv.innerHTML = `<div class="alert-banner alert-success">✅ تم العثور على البدلة وهي متاحة</div>`;
-      setSelectedSuit(suit);
+      resultDiv.innerHTML = '<div class="alert-banner alert-success">✅ تم العثور على البدلة وهي متاحة</div>';
+      setSelectedSuit1(suit);
     }
-  } catch (err) {
-    hideLoading();
-    resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ خطأ في الاتصال، حاول مرة أخرى</div>';
-  }
+  } catch(e) { hideLoading(); resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ خطأ في الاتصال</div>'; }
 }
 
-function setSelectedSuit(suit) {
-  selectedSuit = suit;
-  document.getElementById('selectedSuitText').textContent =
-    `تم اختيار: ${suit.suit_id} | ${suit.suit_type} | ${suit.color} | مقاس ${suit.size} | ${suit.suit_parts}`;
-  document.getElementById('selectedSuitBox').classList.add('show');
-
+function setSelectedSuit1(suit) {
+  selectedSuit1 = suit;
+  document.getElementById('selectedSuit1Text').textContent =
+    `${suit.suit_id} | ${suit.suit_type} | ${suit.color} | مقاس ${suit.size} | ${suit.suit_parts}`;
+  const box = document.getElementById('selectedSuit1Box');
+  box.style.display = 'flex';
   const img = SuitImages.get(suit.suit_id);
-  const imgWrap = document.getElementById('selectedSuitImgWrap');
-  const imgEl = document.getElementById('selectedSuitImg');
-  if (img) {
-    imgEl.src = img;
-    imgWrap.style.display = 'block';
-  } else {
-    imgWrap.style.display = 'none';
+  const imgWrap = document.getElementById('selectedSuit1ImgWrap');
+  if (img) { document.getElementById('selectedSuit1Img').src = img; imgWrap.style.display = 'block'; }
+  else { imgWrap.style.display = 'none'; }
+}
+
+function clearSelectedSuit1() {
+  selectedSuit1 = null;
+  document.getElementById('selectedSuit1Box').style.display = 'none';
+}
+
+// ========================
+//  Search suits 2
+// ========================
+async function searchSuits2() {
+  showLoading('جاري البحث...');
+  try {
+    const all = await loadSuits();
+    const results = applyFilters(all, 's2Type', 's2Parts', 's2Color', 's2Size');
+    hideLoading();
+    const tbody = document.getElementById('searchResultsBody2');
+    const container = document.getElementById('searchResults2');
+    if (!results.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد بدل مطابقة</td></tr>';
+    } else {
+      tbody.innerHTML = results.map(s => `
+        <tr onclick="selectSuit2FromTable('${s.suit_id}')" id="row2-${s.suit_id}" style="cursor:pointer">
+          <td><input type="radio" name="suit2Pick" value="${s.suit_id}"></td>
+          <td><strong>${s.suit_id}</strong></td>
+          <td>${s.suit_type}</td><td>${s.suit_parts}</td><td>${s.color}</td>
+          <td><span class="badge badge-primary">${s.size}</span></td>
+        </tr>
+      `).join('');
+    }
+    container.style.display = 'block';
+  } catch(e) { hideLoading(); showToast('فشل تحميل البدل', 'danger'); }
+}
+
+async function selectSuit2FromTable(suit_id) {
+  if (selectedSuit1 && selectedSuit1.suit_id === suit_id) {
+    showToast('هذا الكود مختار بالفعل في القطعة الأولى', 'warning'); return;
   }
+  const radio = document.querySelector(`input[name="suit2Pick"][value="${suit_id}"]`);
+  if (radio) radio.checked = true;
+  document.querySelectorAll('#searchResultsBody2 tr').forEach(tr => tr.classList.remove('selected'));
+  const row = document.getElementById(`row2-${suit_id}`);
+  if (row) row.classList.add('selected');
+  const suits = await loadSuits();
+  const suit = suits.find(s => s.suit_id === suit_id);
+  if (suit) setSelectedSuit2(suit);
 }
 
-function clearSelectedSuit() {
-  selectedSuit = null;
-  document.getElementById('selectedSuitBox').classList.remove('show');
+async function checkDirectCode2() {
+  const code = document.getElementById('directCode2').value.trim().toUpperCase();
+  const resultDiv = document.getElementById('directCodeResult2');
+  if (!code) { resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ يرجى إدخال كود البدلة</div>'; return; }
+  if (selectedSuit1 && selectedSuit1.suit_id === code) {
+    resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ هذا الكود مختار بالفعل في القطعة الأولى</div>'; return;
+  }
+  showLoading('جاري التحقق...');
+  try {
+    const suit = await getSuitById(code);
+    hideLoading();
+    if (!suit) {
+      resultDiv.innerHTML = '<div class="alert-banner alert-red">❌ الكود غير موجود في النظام</div>';
+      clearSelectedSuit2();
+    } else if (suit.status !== 'متاحة') {
+      resultDiv.innerHTML = `<div class="alert-banner alert-red">🔒 البدلة <strong>${code}</strong> مؤجَّرة حالياً — غير متاحة</div>`;
+      clearSelectedSuit2();
+    } else {
+      resultDiv.innerHTML = '<div class="alert-banner alert-success">✅ تم العثور على البدلة وهي متاحة</div>';
+      setSelectedSuit2(suit);
+    }
+  } catch(e) { hideLoading(); resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ خطأ في الاتصال</div>'; }
 }
 
+function setSelectedSuit2(suit) {
+  selectedSuit2 = suit;
+  document.getElementById('selectedSuit2Text').textContent =
+    `${suit.suit_id} | ${suit.suit_type} | ${suit.color} | مقاس ${suit.size} | ${suit.suit_parts}`;
+  const box = document.getElementById('selectedSuit2Box');
+  box.style.display = 'flex';
+  const img = SuitImages.get(suit.suit_id);
+  const imgWrap = document.getElementById('selectedSuit2ImgWrap');
+  if (img) { document.getElementById('selectedSuit2Img').src = img; imgWrap.style.display = 'block'; }
+  else { imgWrap.style.display = 'none'; }
+}
+
+function clearSelectedSuit2() {
+  selectedSuit2 = null;
+  document.getElementById('selectedSuit2Box').style.display = 'none';
+}
+
+// ========================
+//  Confirm rental
+// ========================
 async function confirmRental() {
-  // التحقق من اختيار البدلة
-  if (!selectedSuit) {
-    showToast('يرجى اختيار بدلة أولاً', 'warning');
-    return;
+  if (!selectedSuit1) {
+    showToast('يرجى اختيار القطعة الأولى أولاً', 'warning'); return;
+  }
+  if (piece2Visible && !selectedSuit2) {
+    showToast('يرجى اختيار القطعة الثانية أو إلغاء إضافتها', 'warning'); return;
   }
 
   let valid = true;
-
-  // التحقق من بيانات المستأجر
-  const tenantName = document.getElementById('tenantName').value.trim();
-  const tenantPhone = document.getElementById('tenantPhone').value.trim();
+  const tenantName    = document.getElementById('tenantName').value.trim();
+  const tenantPhone   = document.getElementById('tenantPhone').value.trim();
   const tenantAddress = document.getElementById('tenantAddress').value.trim();
-  const nationalId = document.getElementById('nationalId').value.trim();
-  const checkoutDate = document.getElementById('checkoutDate').value;
-  const expectedReturn = document.getElementById('expectedReturn').value;
-  const rentalPrice = document.getElementById('rentalPrice').value;
+  const nationalId    = document.getElementById('nationalId').value.trim();
+  const checkoutDate  = document.getElementById('checkoutDate').value;
+  const expectedReturn= document.getElementById('expectedReturn').value;
+  const rentalPrice   = document.getElementById('rentalPrice').value;
   const depositAmount = document.getElementById('depositAmount').value;
   const paymentMethod = document.getElementById('paymentMethod').value;
-  const notes = document.getElementById('notes').value.trim();
+  const notes         = document.getElementById('notes').value.trim();
 
-  // اسم المستأجر
-  valid = validate('tenantName', !!tenantName, 'errTenantName') && valid;
-
-  // رقم الموبايل
-  const phoneRegex = /^(010|011|012|015)\d{8}$/;
-  valid = validate('tenantPhone', phoneRegex.test(tenantPhone), 'errTenantPhone') && valid;
-
-  // العنوان
-  valid = validate('tenantAddress', !!tenantAddress, 'errTenantAddress') && valid;
-
-  // البطاقة القومية
-  valid = validate('nationalId', /^\d{14}$/.test(nationalId), 'errNationalId') && valid;
-
-  // تاريخ الخروج
-  valid = validate('checkoutDate', !!checkoutDate, 'errCheckout') && valid;
-
-  // تاريخ العودة
-  const returnOk = !!expectedReturn && expectedReturn >= checkoutDate;
-  valid = validate('expectedReturn', returnOk, 'errReturn') && valid;
-
-  // السعر
-  valid = validate('rentalPrice', !!rentalPrice && Number(rentalPrice) >= 0, 'errPrice') && valid;
-
-  // التأمين
-  valid = validate('depositAmount', !!depositAmount && Number(depositAmount) >= 0, 'errDeposit') && valid;
-
-  // طريقة الدفع
-  valid = validate('paymentMethod', !!paymentMethod, 'errPayment') && valid;
+  valid = validate('tenantName',    !!tenantName,                                 'errTenantName')   && valid;
+  valid = validate('tenantPhone',   /^(010|011|012|015)\d{8}$/.test(tenantPhone), 'errTenantPhone')  && valid;
+  valid = validate('tenantAddress', !!tenantAddress,                               'errTenantAddress')&& valid;
+  valid = validate('nationalId',    /^\d{14}$/.test(nationalId),                  'errNationalId')   && valid;
+  valid = validate('checkoutDate',  !!checkoutDate,                               'errCheckout')     && valid;
+  valid = validate('expectedReturn',!!expectedReturn && expectedReturn >= checkoutDate, 'errReturn') && valid;
+  valid = validate('rentalPrice',   !!rentalPrice && Number(rentalPrice) >= 0,    'errPrice')        && valid;
+  valid = validate('depositAmount', !!depositAmount && Number(depositAmount) >= 0,'errDeposit')      && valid;
+  valid = validate('paymentMethod', !!paymentMethod,                              'errPayment')      && valid;
 
   if (!valid) {
     document.getElementById('formError').textContent = '⚠️ يرجى تصحيح الأخطاء أعلاه قبل المتابعة';
@@ -450,7 +606,6 @@ async function confirmRental() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
-
   document.getElementById('formError').style.display = 'none';
 
   const btn = document.getElementById('confirmBtn');
@@ -459,85 +614,100 @@ async function confirmRental() {
 
   try {
     const user = Auth.getCurrentUser();
-    const rental_id = await generateRentalId();
+    const rental_id1 = await generateRentalId();
 
-    const rentalData = {
-      rental_id,
-      suit_id: selectedSuit.suit_id,
-      suit_type: selectedSuit.suit_type,
-      suit_parts: selectedSuit.suit_parts,
-      color: selectedSuit.color,
-      size: selectedSuit.size,
-      tenant_name: tenantName,
-      tenant_phone: tenantPhone,
-      tenant_address: tenantAddress,
-      national_id: nationalId,
-      checkout_date: checkoutDate,
-      expected_return: expectedReturn,
-      actual_return: '',
-      rental_price: rentalPrice,
-      payment_method: paymentMethod,
-      deposit_amount: depositAmount,
-      deposit_returned: 'لا',
-      rented_by: user.username,
-      returned_by: '',
-      status: 'مؤجَّرة',
-      notes
+    const commonData = {
+      tenant_name: tenantName, tenant_phone: tenantPhone,
+      tenant_address: tenantAddress, national_id: nationalId,
+      checkout_date: checkoutDate, expected_return: expectedReturn,
+      actual_return: '', payment_method: paymentMethod,
+      deposit_returned: 'لا', rented_by: user.username,
+      returned_by: '', status: 'مؤجَّرة'
     };
 
-    const result = await addRental(rentalData);
+    const hasTwo = piece2Visible && selectedSuit2;
+    const price1   = hasTwo ? Math.round(Number(rentalPrice)  / 2) : Number(rentalPrice);
+    const deposit1 = hasTwo ? Math.round(Number(depositAmount)/ 2) : Number(depositAmount);
 
-    if (result.success) {
-      showToast(`✅ تم تسجيل التأجير بنجاح — كود العملية: ${rental_id}`,'success', 5000);
-      resetForm();
-    } else {
-      showToast(result.message || 'حدث خطأ أثناء الحفظ', 'danger');
+    const rentalData1 = {
+      ...commonData,
+      rental_id: rental_id1,
+      suit_id: selectedSuit1.suit_id, suit_type: selectedSuit1.suit_type,
+      suit_parts: selectedSuit1.suit_parts, color: selectedSuit1.color,
+      size: selectedSuit1.size,
+      rental_price: price1, deposit_amount: deposit1,
+      notes: hasTwo ? `${notes} [مجموعة مع: ${selectedSuit2.suit_id}]`.trim() : notes
+    };
+
+    const result1 = await addRental(rentalData1);
+    if (!result1.success) throw new Error(result1.message);
+
+    let rental_id2 = '';
+    if (hasTwo) {
+      rental_id2 = await generateRentalId();
+      const rentalData2 = {
+        ...commonData,
+        rental_id: rental_id2,
+        suit_id: selectedSuit2.suit_id, suit_type: selectedSuit2.suit_type,
+        suit_parts: selectedSuit2.suit_parts, color: selectedSuit2.color,
+        size: selectedSuit2.size,
+        rental_price: Number(rentalPrice) - price1,
+        deposit_amount: Number(depositAmount) - deposit1,
+        notes: `${notes} [مجموعة مع: ${selectedSuit1.suit_id}]`.trim()
+      };
+      const result2 = await addRental(rentalData2);
+      if (!result2.success) throw new Error(result2.message);
     }
-  } catch (err) {
-    showToast('فشل الاتصال بقاعدة البيانات، تأكد من الإعدادات', 'danger');
+
+    const msg = hasTwo
+      ? `✅ تم تسجيل التأجير بنجاح — كودا العمليتين: ${rental_id1} + ${rental_id2}`
+      : `✅ تم تسجيل التأجير بنجاح — كود العملية: ${rental_id1}`;
+
+    showToast(msg, 'success', 5000);
+    resetForm();
+  } catch(err) {
+    showToast('فشل الاتصال بقاعدة البيانات: ' + err.message, 'danger');
   } finally {
     btn.disabled = false;
     btn.textContent = '✅ تأكيد التأجير';
   }
 }
 
+// ========================
+//  Helpers
+// ========================
 function validate(fieldId, condition, errId) {
   const field = document.getElementById(fieldId);
-  const err = document.getElementById(errId);
-  if (!condition) {
-    field.classList.add('error');
-    err.classList.add('show');
-    return false;
-  } else {
-    field.classList.remove('error');
-    err.classList.remove('show');
-    return true;
-  }
+  const err   = document.getElementById(errId);
+  if (!condition) { field.classList.add('error'); err.classList.add('show'); return false; }
+  else            { field.classList.remove('error'); err.classList.remove('show'); return true; }
 }
 
 function resetForm() {
-  clearSelectedSuit();
+  clearSelectedSuit1();
+  clearSelectedSuit2();
+  if (piece2Visible) togglePiece2();
+
   ['tenantName','tenantPhone','tenantAddress','nationalId',
-   'rentalPrice','depositAmount','notes','directCode'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+   'rentalPrice','depositAmount','notes','directCode1','directCode2'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
-  ['paymentMethod','sType','sParts','sColor','sSize'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+  ['paymentMethod','s1Type','s1Parts','s1Color','s1Size',
+                   's2Type','s2Parts','s2Color','s2Size'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('checkoutDate').value = todayISO();
   document.getElementById('expectedReturn').value = '';
-  document.getElementById('searchResults').style.display = 'none';
-  document.getElementById('directCodeResult').innerHTML = '';
+  ['searchResults1','searchResults2'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  ['directCodeResult1','directCodeResult2'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.innerHTML = '';
+  });
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
   document.querySelectorAll('.form-control').forEach(e => e.classList.remove('error'));
+  suitsCache = null;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function openImgViewer() {
-  const src = document.getElementById('selectedSuitImg').src;
-  const suitId = selectedSuit ? selectedSuit.suit_id : '';
-  openImgViewerSrc(src, suitId);
 }
 
 function openImgViewerSrc(src, suitId) {
@@ -545,12 +715,12 @@ function openImgViewerSrc(src, suitId) {
   document.getElementById('imgViewerTitle').textContent = '👔 بدلة رقم: ' + suitId;
   document.getElementById('imgViewerModal').style.display = 'flex';
 }
-
 function closeImgViewer() {
   document.getElementById('imgViewerModal').style.display = 'none';
 }
 </script>
 
+<!-- Image Viewer Modal -->
 <div id="imgViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="closeImgViewer()">
   <div style="color:white;font-size:16px;font-weight:700" id="imgViewerTitle"></div>
   <img id="imgViewerImg" style="max-width:90vw;max-height:80vh;border-radius:14px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.6)">

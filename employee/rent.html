@@ -295,28 +295,23 @@
 // القطع المختارة
 let selectedPieces = { jacket: null, pants: null, vest: null };
 
-// كاش كل البدل المتاحة (مشترك بين الأقسام)
-let _allSuitsCache = null;
+// كاش البدل المتاحة حسب النوع
+let _cachedByType = { jacket: null, pants: null, vest: null };
 
 const PIECE_TYPES = {
   jacket: 'جاكيت',
-  pants:  'بنطلون',
-  vest:   'سديري'
+  pants: 'بنطلون',
+  vest: 'سديري'
 };
-
-/* جلب كل البدل المتاحة مرة واحدة */
-async function fetchAllSuits() {
-  if (!_allSuitsCache) _allSuitsCache = await getAvailableSuits();
-  return _allSuitsCache;
-}
 
 async function loadFiltersForPiece(piece) {
   const loadingMsg = document.getElementById(`filtersLoadingMsg-${piece}`);
-  const errMsg     = document.getElementById(`filtersLoadingErr-${piece}`);
-  const container  = document.getElementById(`filtersContainer-${piece}`);
+  const errMsg = document.getElementById(`filtersLoadingErr-${piece}`);
+  const container = document.getElementById(`filtersContainer-${piece}`);
   try {
-    // ✅ نجلب كل البدل — مش مقيّدين بنوع واحد
-    const suits = await fetchAllSuits();
+    const allSuits = await getAvailableSuits();
+    const suits = allSuits.filter(s => s.suit_parts === PIECE_TYPES[piece]);
+    _cachedByType[piece] = suits;
 
     const unique = (key) => [...new Set(suits.map(s => s[key]).filter(Boolean))].sort();
     const colors = unique('color');
@@ -331,23 +326,26 @@ async function loadFiltersForPiece(piece) {
     fillSelect(`sSize-${piece}`,  sizes);
 
     loadingMsg.style.display = 'none';
-    container.style.display  = 'block';
+    container.style.display = 'block';
     document.getElementById(`countBadge-${piece}`).textContent =
       suits.length ? `(${suits.length} متاح)` : '(لا يوجد متاح)';
   } catch (err) {
     loadingMsg.style.display = 'none';
-    errMsg.style.display     = 'block';
-    errMsg.textContent       = '❌ فشل تحميل البيانات: ' + err.message;
-    container.style.display  = 'block';
+    errMsg.style.display = 'block';
+    errMsg.textContent = '❌ فشل تحميل البيانات: ' + err.message;
+    container.style.display = 'block';
   }
 }
 
 async function showAllPieces(piece) {
   showLoading('جاري التحميل...');
   try {
-    const suits = await fetchAllSuits();
+    if (!_cachedByType[piece]) {
+      const allSuits = await getAvailableSuits();
+      _cachedByType[piece] = allSuits.filter(s => s.suit_parts === PIECE_TYPES[piece]);
+    }
     hideLoading();
-    renderPieceTable(piece, suits);
+    renderPieceTable(piece, _cachedByType[piece]);
   } catch(err) {
     hideLoading();
     showToast('فشل تحميل البدل: ' + err.message, 'danger');
@@ -356,7 +354,7 @@ async function showAllPieces(piece) {
 
 function renderPieceTable(piece, results) {
   const container = document.getElementById(`searchResults-${piece}`);
-  const tbody     = document.getElementById(`searchResultsBody-${piece}`);
+  const tbody = document.getElementById(`searchResultsBody-${piece}`);
   if (!results.length) {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد قطع مطابقة</td></tr>`;
   } else {
@@ -386,10 +384,13 @@ async function searchPiece(piece) {
 
   showLoading('جاري البحث...');
   try {
-    // ✅ نبحث في كل البدل
-    let results = await fetchAllSuits();
+    if (!_cachedByType[piece]) {
+      const allSuits = await getAvailableSuits();
+      _cachedByType[piece] = allSuits.filter(s => s.suit_parts === PIECE_TYPES[piece]);
+    }
+    let results = _cachedByType[piece];
     if (color) results = results.filter(s => s.color === color);
-    if (size)  results = results.filter(s => s.size  === size);
+    if (size)  results = results.filter(s => s.size === size);
     hideLoading();
     renderPieceTable(piece, results);
   } catch (err) {
@@ -407,18 +408,18 @@ function selectPieceFromTable(piece, suit_id) {
   if (row) row.classList.add('selected');
 
   const normalizedId = String(suit_id).trim().toUpperCase();
-  if (_allSuitsCache) {
-    const suit = _allSuitsCache.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
+  if (_cachedByType[piece]) {
+    const suit = _cachedByType[piece].find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
     if (suit) { setSelectedPiece(piece, suit); return; }
   }
-  fetchAllSuits().then(suits => {
+  getAvailableSuits().then(suits => {
     const suit = suits.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
     if (suit) setSelectedPiece(piece, suit);
   });
 }
 
 async function checkDirectCode(piece) {
-  const code      = document.getElementById(`directCode-${piece}`).value.trim().toUpperCase();
+  const code = document.getElementById(`directCode-${piece}`).value.trim().toUpperCase();
   const resultDiv = document.getElementById(`directCodeResult-${piece}`);
 
   if (!code) {
@@ -434,17 +435,14 @@ async function checkDirectCode(piece) {
     if (!suit) {
       resultDiv.innerHTML = '<div class="alert-banner alert-red">❌ الكود غير موجود في النظام</div>';
       clearPiece(piece);
+    } else if (suit.suit_parts !== PIECE_TYPES[piece]) {
+      resultDiv.innerHTML = `<div class="alert-banner alert-red">⚠️ هذه القطعة (${suit.suit_parts}) لا تطابق ${PIECE_TYPES[piece]}</div>`;
+      clearPiece(piece);
     } else if (suit.status !== 'متاحة') {
-      // ✅ فقط نتحقق من الإتاحة — لا نرفض بسبب نوع القطعة
       resultDiv.innerHTML = `<div class="alert-banner alert-red">🔒 الكود <strong>${code}</strong> مؤجَّر حالياً — غير متاح</div>`;
       clearPiece(piece);
     } else {
-      // ملاحظة صغيرة لو النوع مختلف (للمعلومية فقط، لا للرفض)
-      const pieceLabel = PIECE_TYPES[piece];
-      const typeNote   = suit.suit_parts && suit.suit_parts !== pieceLabel
-        ? ` <span style="font-size:11px;color:var(--gray-500)">(النوع الأصلي: ${suit.suit_parts})</span>`
-        : '';
-      resultDiv.innerHTML = `<div class="alert-banner alert-success">✅ متاحة — سيُسجَّل كـ <strong>${pieceLabel}</strong>${typeNote}</div>`;
+      resultDiv.innerHTML = `<div class="alert-banner alert-success">✅ تم العثور على القطعة وهي متاحة</div>`;
       setSelectedPiece(piece, suit);
     }
   } catch (err) {
@@ -484,7 +482,7 @@ function switchTab(tab, piece) {
     });
   }
   document.getElementById(`tab-search-${piece}`).classList.toggle('active', tab === 'search');
-  document.getElementById(`tab-code-${piece}`).classList.toggle('active',   tab === 'code');
+  document.getElementById(`tab-code-${piece}`).classList.toggle('active', tab === 'code');
   clearPiece(piece);
 }
 
@@ -502,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const todayStr = today();
   document.getElementById('checkoutDate').value = todayStr;
-  document.getElementById('checkoutDate').min   = todayStr;
+  document.getElementById('checkoutDate').min = todayStr;
   document.getElementById('checkoutDate').addEventListener('change', () => {
     document.getElementById('expectedReturn').min = document.getElementById('checkoutDate').value;
   });
@@ -519,26 +517,26 @@ async function confirmRental() {
   }
 
   let valid = true;
-  const tenantName     = document.getElementById('tenantName').value.trim();
-  const tenantPhone    = document.getElementById('tenantPhone').value.trim();
-  const tenantAddress  = document.getElementById('tenantAddress').value.trim();
-  const nationalId     = document.getElementById('nationalId').value.trim();
-  const checkoutDate   = document.getElementById('checkoutDate').value;
-  const expectedReturn = document.getElementById('expectedReturn').value;
-  const rentalPrice    = document.getElementById('rentalPrice').value;
-  const depositAmount  = document.getElementById('depositAmount').value;
-  const paymentMethod  = document.getElementById('paymentMethod').value;
-  const notes          = document.getElementById('notes').value.trim();
+  const tenantName    = document.getElementById('tenantName').value.trim();
+  const tenantPhone   = document.getElementById('tenantPhone').value.trim();
+  const tenantAddress = document.getElementById('tenantAddress').value.trim();
+  const nationalId    = document.getElementById('nationalId').value.trim();
+  const checkoutDate  = document.getElementById('checkoutDate').value;
+  const expectedReturn= document.getElementById('expectedReturn').value;
+  const rentalPrice   = document.getElementById('rentalPrice').value;
+  const depositAmount = document.getElementById('depositAmount').value;
+  const paymentMethod = document.getElementById('paymentMethod').value;
+  const notes         = document.getElementById('notes').value.trim();
 
-  valid = validate('tenantName',    !!tenantName,                                  'errTenantName')    && valid;
-  valid = validate('tenantPhone',   /^(010|011|012|015)\d{8}$/.test(tenantPhone),  'errTenantPhone')   && valid;
-  valid = validate('tenantAddress', !!tenantAddress,                               'errTenantAddress') && valid;
-  valid = validate('nationalId',    /^\d{14}$/.test(nationalId),                   'errNationalId')    && valid;
-  valid = validate('checkoutDate',  !!checkoutDate,                                'errCheckout')      && valid;
-  valid = validate('expectedReturn',!!expectedReturn && expectedReturn >= checkoutDate,'errReturn')     && valid;
-  valid = validate('rentalPrice',   !!rentalPrice && Number(rentalPrice) >= 0,      'errPrice')        && valid;
-  valid = validate('depositAmount', !!depositAmount && Number(depositAmount) >= 0,  'errDeposit')      && valid;
-  valid = validate('paymentMethod', !!paymentMethod,                               'errPayment')       && valid;
+  valid = validate('tenantName',    !!tenantName,                           'errTenantName')  && valid;
+  valid = validate('tenantPhone',   /^(010|011|012|015)\d{8}$/.test(tenantPhone), 'errTenantPhone') && valid;
+  valid = validate('tenantAddress', !!tenantAddress,                        'errTenantAddress') && valid;
+  valid = validate('nationalId',    /^\d{14}$/.test(nationalId),            'errNationalId')  && valid;
+  valid = validate('checkoutDate',  !!checkoutDate,                         'errCheckout')    && valid;
+  valid = validate('expectedReturn',!!expectedReturn && expectedReturn >= checkoutDate, 'errReturn') && valid;
+  valid = validate('rentalPrice',   !!rentalPrice && Number(rentalPrice) >= 0, 'errPrice')    && valid;
+  valid = validate('depositAmount', !!depositAmount && Number(depositAmount) >= 0,'errDeposit')&& valid;
+  valid = validate('paymentMethod', !!paymentMethod,                        'errPayment')     && valid;
 
   if (!valid) {
     document.getElementById('formError').textContent = '⚠️ يرجى تصحيح الأخطاء أعلاه قبل المتابعة';
@@ -549,46 +547,48 @@ async function confirmRental() {
   document.getElementById('formError').style.display = 'none';
 
   const btn = document.getElementById('confirmBtn');
-  btn.disabled  = true;
+  btn.disabled = true;
   btn.innerHTML = '<span class="loading-spinner"></span> جاري الحفظ...';
 
   try {
-    const user   = Auth.getCurrentUser();
+    const user = Auth.getCurrentUser();
     const pieces = [jacket, pants, vest].filter(Boolean);
+
+    // حفظ سجل تأجير لكل قطعة مع ربطها بنفس رقم العملية
     const group_rental_id = await generateRentalId();
     let allSuccess = true;
 
     for (let i = 0; i < pieces.length; i++) {
-      const piece     = pieces[i];
-      const rental_id = i === 0 ? group_rental_id : group_rental_id + '-' + (i + 1);
+      const piece = pieces[i];
+      const rental_id = i === 0 ? group_rental_id : group_rental_id + '-' + (i+1);
 
       const rentalData = {
         rental_id,
-        suit_id:          piece.suit_id,
-        suit_type:        piece.suit_type,
-        suit_parts:       piece.suit_parts,
-        color:            piece.color,
-        size:             piece.size,
-        tenant_name:      tenantName,
-        tenant_phone:     tenantPhone,
-        tenant_address:   tenantAddress,
-        national_id:      nationalId,
-        national_id_img:  '',
-        checkout_date:    checkoutDate,
-        expected_return:  expectedReturn,
-        actual_return:    '',
-        rental_price:     i === 0 ? rentalPrice : '0',
-        payment_method:   paymentMethod,
-        deposit_amount:   i === 0 ? depositAmount : '0',
+        suit_id:     piece.suit_id,
+        suit_type:   piece.suit_type,
+        suit_parts:  piece.suit_parts,
+        color:       piece.color,
+        size:        piece.size,
+        tenant_name:    tenantName,
+        tenant_phone:   tenantPhone,
+        tenant_address: tenantAddress,
+        national_id:    nationalId,
+        national_id_img:'',
+        checkout_date:  checkoutDate,
+        expected_return:expectedReturn,
+        actual_return:  '',
+        rental_price:   i === 0 ? rentalPrice : '0',
+        payment_method: paymentMethod,
+        deposit_amount: i === 0 ? depositAmount : '0',
         deposit_returned: 'لا',
-        rented_by:        user.username,
-        returned_by:      '',
-        status:           'مؤجَّرة',
-        notes:            i === 0 ? notes : `مجموعة مع ${group_rental_id}`
+        rented_by:    user.username,
+        returned_by:  '',
+        status:       'مؤجَّرة',
+        notes:        i === 0 ? notes : `مجموعة مع ${group_rental_id}`
       };
 
       const result = await addRental(rentalData);
-      if (!result.success) allSuccess = false;
+      if (!result.success) { allSuccess = false; }
     }
 
     if (allSuccess) {
@@ -601,7 +601,7 @@ async function confirmRental() {
   } catch (err) {
     showToast('فشل الاتصال بقاعدة البيانات، تأكد من الإعدادات', 'danger');
   } finally {
-    btn.disabled    = false;
+    btn.disabled = false;
     btn.textContent = '✅ تأكيد التأجير';
   }
 }
@@ -609,13 +609,15 @@ async function confirmRental() {
 function validate(fieldId, condition, errId) {
   const field = document.getElementById(fieldId);
   const err   = document.getElementById(errId);
-  if (!condition) { field.classList.add('error');    err.classList.add('show');    return false; }
-  else            { field.classList.remove('error'); err.classList.remove('show'); return true;  }
+  if (!condition) {
+    field.classList.add('error'); err.classList.add('show'); return false;
+  } else {
+    field.classList.remove('error'); err.classList.remove('show'); return true;
+  }
 }
 
 function resetForm() {
   selectedPieces = { jacket: null, pants: null, vest: null };
-  _allSuitsCache = null;
   ['jacket','pants','vest'].forEach(p => {
     clearPiece(p);
     const dc = document.getElementById(`directCode-${p}`);
@@ -626,11 +628,15 @@ function resetForm() {
     if (sr) sr.style.display = 'none';
   });
   ['tenantName','tenantPhone','tenantAddress','nationalId','rentalPrice','depositAmount','notes'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
-  document.getElementById('paymentMethod').value    = '';
-  document.getElementById('checkoutDate').value     = today();
-  document.getElementById('expectedReturn').value   = '';
+  ['paymentMethod'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('checkoutDate').value = today();
+  document.getElementById('expectedReturn').value = '';
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
   document.querySelectorAll('.form-control').forEach(e => e.classList.remove('error'));
   window.scrollTo({ top: 0, behavior: 'smooth' });

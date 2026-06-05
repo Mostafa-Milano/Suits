@@ -6,87 +6,6 @@
   <title>Milano Suits — تسجيل تأجير</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
-
-<style>
-/* ── Piece Selector Bar ── */
-.piece-selector-bar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.piece-selector-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 8px;
-  border: 2px solid var(--gray-200);
-  border-radius: 12px;
-  background: var(--white);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-.piece-selector-btn:hover {
-  border-color: var(--accent);
-  background: rgba(201,168,76,0.06);
-}
-.piece-selector-btn.active {
-  border-color: var(--accent);
-  background: rgba(201,168,76,0.1);
-  box-shadow: 0 2px 10px rgba(201,168,76,0.2);
-}
-.piece-btn-icon { font-size: 24px; }
-.piece-btn-label { font-size: 13px; font-weight: 700; color: var(--gray-800); }
-.piece-btn-status {
-  font-size: 11px;
-  color: var(--gray-500);
-  font-weight: 500;
-  background: var(--gray-100);
-  padding: 2px 8px;
-  border-radius: 20px;
-  max-width: 90px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.piece-btn-status.optional-tag { color: #f59e0b; background: rgba(245,158,11,0.1); }
-.piece-btn-status.selected-tag { color: var(--success); background: rgba(40,167,69,0.1); font-weight: 700; }
-
-/* ── Workspace ── */
-.piece-workspace {
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  padding: 16px;
-  background: var(--white);
-  transition: border-color 0.25s ease;
-  margin-bottom: 16px;
-}
-
-/* ── Summary ── */
-.pieces-summary { margin-top: 4px; }
-.pieces-summary-title { font-size: 14px; font-weight: 700; color: var(--gray-700); margin-bottom: 10px; }
-.pieces-summary-grid { display: flex; flex-direction: column; gap: 8px; }
-.summary-piece-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(40,167,69,0.06), rgba(40,167,69,0.02));
-  border: 1px solid rgba(40,167,69,0.2);
-  border-radius: 10px;
-}
-.summary-piece-info { flex: 1; }
-.summary-piece-name { font-size: 13px; font-weight: 700; color: var(--gray-800); }
-.summary-piece-detail { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
-.summary-piece-remove {
-  background: none; border: none; color: var(--danger);
-  cursor: pointer; font-size: 14px; padding: 4px 8px;
-  border-radius: 6px; transition: background 0.15s;
-}
-.summary-piece-remove:hover { background: rgba(220,53,69,0.1); }
-</style>
 </head>
 <body>
 
@@ -107,71 +26,157 @@
       </div>
       <div class="section-card-body">
 
-        <!-- شريط اختيار القطعة -->
-        <div class="piece-selector-bar">
-          <button class="piece-selector-btn active" onclick="activatePiece('jacket')" id="piecebtn-jacket">
-            <span class="piece-btn-icon">🧥</span>
-            <span class="piece-btn-label">الجاكيت</span>
-            <span class="piece-btn-status" id="piecestatus-jacket">—</span>
-          </button>
-          <button class="piece-selector-btn" onclick="activatePiece('pants')" id="piecebtn-pants">
-            <span class="piece-btn-icon">👖</span>
-            <span class="piece-btn-label">البنطلون</span>
-            <span class="piece-btn-status" id="piecestatus-pants">—</span>
-          </button>
-          <button class="piece-selector-btn" onclick="activatePiece('vest')" id="piecebtn-vest">
-            <span class="piece-btn-icon">🦺</span>
-            <span class="piece-btn-label">السديري</span>
-            <span class="piece-btn-status optional-tag" id="piecestatus-vest">اختياري</span>
-          </button>
-        </div>
-
-        <!-- منطقة الاختيار الموحدة -->
-        <div class="piece-workspace" id="piece-workspace">
+        <!-- اختيار الجاكيت -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--accent)">🧥 الجاكيت</div>
           <div class="tabs-container" style="box-shadow:none;border:none">
             <div class="tabs-nav">
-              <button class="tab-btn active" id="tabwsbtn-search" onclick="switchWorkspaceTab('search')">🔍 بحث</button>
-              <button class="tab-btn" id="tabwsbtn-code" onclick="switchWorkspaceTab('code')">📝 كود مباشر</button>
+              <button class="tab-btn active" onclick="switchTab('search','jacket')">🔍 بحث</button>
+              <button class="tab-btn" onclick="switchTab('code','jacket')">📝 كود مباشر</button>
             </div>
-            <div id="tabws-search" class="tab-content active">
-              <div id="ws-filtersLoadingMsg" style="text-align:center;padding:14px;color:var(--gray-500);font-size:14px">
+            <div id="tab-search-jacket" class="tab-content active">
+              <div id="filtersLoadingMsg-jacket" style="text-align:center;padding:14px;color:var(--gray-500);font-size:14px">
                 <span class="loading-spinner"></span> جاري تحميل البيانات...
               </div>
-              <div id="ws-filtersLoadingErr" style="display:none;padding:10px 14px;background:#f8d7da;color:#721c24;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
-              <div id="ws-filtersContainer" style="display:none">
+              <div id="filtersLoadingErr-jacket" style="display:none;padding:10px 14px;background:#f8d7da;color:#721c24;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+              <div id="filtersContainer-jacket" style="display:none">
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
-                  <div class="form-group" style="margin:0"><label class="form-label">اللون</label><select id="ws-sColor" class="form-control"><option value="">الكل</option></select></div>
-                  <div class="form-group" style="margin:0"><label class="form-label">المقاس</label><select id="ws-sSize" class="form-control"><option value="">الكل</option></select></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">اللون</label><select id="sColor-jacket" class="form-control"><option value="">الكل</option></select></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">المقاس</label><select id="sSize-jacket" class="form-control"><option value="">الكل</option></select></div>
                 </div>
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                  <button class="btn btn-primary" onclick="searchPieceWS()">🔍 بحث</button>
-                  <button class="btn btn-outline" onclick="showAllPiecesWS()" style="font-size:13px">📋 عرض الكل</button>
-                  <span id="ws-countBadge" style="font-size:13px;color:var(--gray-500)"></span>
+                  <button class="btn btn-primary" onclick="searchPiece('jacket')">🔍 بحث</button>
+                  <button class="btn btn-outline" onclick="showAllPieces('jacket')" style="font-size:13px">📋 عرض الكل</button>
+                  <span id="countBadge-jacket" style="font-size:13px;color:var(--gray-500)"></span>
                 </div>
               </div>
-              <div id="ws-searchResults" style="margin-top:16px;display:none">
+              <div id="searchResults-jacket" style="margin-top:16px;display:none">
                 <div class="table-wrapper">
                   <table class="radio-table">
                     <thead><tr><th>اختر</th><th>الصورة</th><th>الكود</th><th>النوع</th><th>اللون</th><th>المقاس</th></tr></thead>
-                    <tbody id="ws-searchResultsBody"></tbody>
+                    <tbody id="searchResultsBody-jacket"></tbody>
                   </table>
                 </div>
               </div>
             </div>
-            <div id="tabws-code" class="tab-content">
+            <div id="tab-code-jacket" class="tab-content">
               <div class="search-box">
-                <input type="text" id="ws-directCode" class="form-control" placeholder="مثال: S-001" style="font-size:16px;font-weight:600;letter-spacing:1px">
-                <button class="btn btn-primary" onclick="checkDirectCodeWS()">✅ تحقق</button>
+                <input type="text" id="directCode-jacket" class="form-control" placeholder="مثال: S-001" style="font-size:16px;font-weight:600;letter-spacing:1px">
+                <button class="btn btn-primary" onclick="checkDirectCode('jacket')">✅ تحقق</button>
               </div>
-              <div id="ws-directCodeResult" style="margin-top:12px"></div>
+              <div id="directCodeResult-jacket" style="margin-top:12px"></div>
             </div>
+          </div>
+          <div id="selectedBox-jacket" class="selected-suit-box" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <span style="font-size:20px">✅</span>
+            <span id="selectedText-jacket"></span>
+            <div id="selectedImgWrap-jacket" style="display:none;margin-right:auto">
+              <img id="selectedImg-jacket" style="width:64px;height:64px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--accent)" onclick="openImgViewerFromPiece('jacket')">
+            </div>
+            <button onclick="clearPiece('jacket')" style="margin-right:auto;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px">✕ إلغاء</button>
           </div>
         </div>
 
-        <!-- ملخص القطع المختارة -->
-        <div class="pieces-summary" id="pieces-summary" style="display:none">
-          <div class="pieces-summary-title">✅ القطع المختارة</div>
-          <div class="pieces-summary-grid" id="pieces-summary-grid"></div>
+        <!-- اختيار البنطلون -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:15px;font-weight:700;color:var(--success);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--success)">👖 البنطلون</div>
+          <div class="tabs-container" style="box-shadow:none;border:none">
+            <div class="tabs-nav">
+              <button class="tab-btn active" onclick="switchTab('search','pants')">🔍 بحث</button>
+              <button class="tab-btn" onclick="switchTab('code','pants')">📝 كود مباشر</button>
+            </div>
+            <div id="tab-search-pants" class="tab-content active">
+              <div id="filtersLoadingMsg-pants" style="text-align:center;padding:14px;color:var(--gray-500);font-size:14px">
+                <span class="loading-spinner"></span> جاري تحميل البيانات...
+              </div>
+              <div id="filtersLoadingErr-pants" style="display:none;padding:10px 14px;background:#f8d7da;color:#721c24;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+              <div id="filtersContainer-pants" style="display:none">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
+                  <div class="form-group" style="margin:0"><label class="form-label">اللون</label><select id="sColor-pants" class="form-control"><option value="">الكل</option></select></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">المقاس</label><select id="sSize-pants" class="form-control"><option value="">الكل</option></select></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                  <button class="btn btn-primary" onclick="searchPiece('pants')">🔍 بحث</button>
+                  <button class="btn btn-outline" onclick="showAllPieces('pants')" style="font-size:13px">📋 عرض الكل</button>
+                  <span id="countBadge-pants" style="font-size:13px;color:var(--gray-500)"></span>
+                </div>
+              </div>
+              <div id="searchResults-pants" style="margin-top:16px;display:none">
+                <div class="table-wrapper">
+                  <table class="radio-table">
+                    <thead><tr><th>اختر</th><th>الصورة</th><th>الكود</th><th>النوع</th><th>اللون</th><th>المقاس</th></tr></thead>
+                    <tbody id="searchResultsBody-pants"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div id="tab-code-pants" class="tab-content">
+              <div class="search-box">
+                <input type="text" id="directCode-pants" class="form-control" placeholder="مثال: S-002" style="font-size:16px;font-weight:600;letter-spacing:1px">
+                <button class="btn btn-primary" onclick="checkDirectCode('pants')">✅ تحقق</button>
+              </div>
+              <div id="directCodeResult-pants" style="margin-top:12px"></div>
+            </div>
+          </div>
+          <div id="selectedBox-pants" class="selected-suit-box" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <span style="font-size:20px">✅</span>
+            <span id="selectedText-pants"></span>
+            <div id="selectedImgWrap-pants" style="display:none;margin-right:auto">
+              <img id="selectedImg-pants" style="width:64px;height:64px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid var(--success)" onclick="openImgViewerFromPiece('pants')">
+            </div>
+            <button onclick="clearPiece('pants')" style="margin-right:auto;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px">✕ إلغاء</button>
+          </div>
+        </div>
+
+        <!-- اختيار السديري (اختياري) -->
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--warning,#f59e0b);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f59e0b">🦺 السديري <span style="font-size:12px;font-weight:400;color:var(--gray-500)">(اختياري)</span></div>
+          <div class="tabs-container" style="box-shadow:none;border:none">
+            <div class="tabs-nav">
+              <button class="tab-btn active" onclick="switchTab('search','vest')">🔍 بحث</button>
+              <button class="tab-btn" onclick="switchTab('code','vest')">📝 كود مباشر</button>
+            </div>
+            <div id="tab-search-vest" class="tab-content active">
+              <div id="filtersLoadingMsg-vest" style="text-align:center;padding:14px;color:var(--gray-500);font-size:14px">
+                <span class="loading-spinner"></span> جاري تحميل البيانات...
+              </div>
+              <div id="filtersLoadingErr-vest" style="display:none;padding:10px 14px;background:#f8d7da;color:#721c24;border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+              <div id="filtersContainer-vest" style="display:none">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px">
+                  <div class="form-group" style="margin:0"><label class="form-label">اللون</label><select id="sColor-vest" class="form-control"><option value="">الكل</option></select></div>
+                  <div class="form-group" style="margin:0"><label class="form-label">المقاس</label><select id="sSize-vest" class="form-control"><option value="">الكل</option></select></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                  <button class="btn btn-primary" onclick="searchPiece('vest')">🔍 بحث</button>
+                  <button class="btn btn-outline" onclick="showAllPieces('vest')" style="font-size:13px">📋 عرض الكل</button>
+                  <span id="countBadge-vest" style="font-size:13px;color:var(--gray-500)"></span>
+                </div>
+              </div>
+              <div id="searchResults-vest" style="margin-top:16px;display:none">
+                <div class="table-wrapper">
+                  <table class="radio-table">
+                    <thead><tr><th>اختر</th><th>الصورة</th><th>الكود</th><th>النوع</th><th>اللون</th><th>المقاس</th></tr></thead>
+                    <tbody id="searchResultsBody-vest"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div id="tab-code-vest" class="tab-content">
+              <div class="search-box">
+                <input type="text" id="directCode-vest" class="form-control" placeholder="مثال: S-003" style="font-size:16px;font-weight:600;letter-spacing:1px">
+                <button class="btn btn-primary" onclick="checkDirectCode('vest')">✅ تحقق</button>
+              </div>
+              <div id="directCodeResult-vest" style="margin-top:12px"></div>
+            </div>
+          </div>
+          <div id="selectedBox-vest" class="selected-suit-box" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <span style="font-size:20px">✅</span>
+            <span id="selectedText-vest"></span>
+            <div id="selectedImgWrap-vest" style="display:none;margin-right:auto">
+              <img id="selectedImg-vest" style="width:64px;height:64px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid #f59e0b" onclick="openImgViewerFromPiece('vest')">
+            </div>
+            <button onclick="clearPiece('vest')" style="margin-right:auto;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px">✕ إلغاء</button>
+          </div>
         </div>
 
       </div>
@@ -289,61 +294,45 @@
 <script>
 // القطع المختارة
 let selectedPieces = { jacket: null, pants: null, vest: null };
-let _cachedByType   = { jacket: null, pants: null, vest: null };
-let _activePiece    = 'jacket';
-let _wsTab          = 'search';
 
-const PIECE_TYPES = { jacket: 'جاكيت', pants: 'بنطلون', vest: 'سديري' };
-const PIECE_COLORS = { jacket: 'var(--accent)', pants: 'var(--success)', vest: '#f59e0b' };
+// كاش كل البدل المتاحة (مشترك بين الأقسام)
+let _allSuitsCache = null;
 
-/* ── تفعيل قطعة ── */
-function activatePiece(piece) {
-  _activePiece = piece;
-  document.querySelectorAll('.piece-selector-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('piecebtn-' + piece).classList.add('active');
+const PIECE_TYPES = {
+  jacket: 'جاكيت',
+  pants:  'بنطلون',
+  vest:   'سديري'
+};
 
-  // تلوين border الـ workspace حسب القطعة
-  document.getElementById('piece-workspace').style.borderColor = PIECE_COLORS[piece];
-
-  // إعادة ضبط workspace
-  resetWorkspace();
-  loadFiltersForActive();
+/* جلب كل البدل المتاحة مرة واحدة */
+async function fetchAllSuits() {
+  if (!_allSuitsCache) _allSuitsCache = await getAvailableSuits();
+  return _allSuitsCache;
 }
 
-/* ── تحميل الفلاتر للقطعة الحالية ── */
-async function loadFiltersForActive() {
-  const piece = _activePiece;
-  const loadingMsg   = document.getElementById('ws-filtersLoadingMsg');
-  const errMsg       = document.getElementById('ws-filtersLoadingErr');
-  const container    = document.getElementById('ws-filtersContainer');
-  const searchResult = document.getElementById('ws-searchResults');
-
-  loadingMsg.style.display = 'block';
-  errMsg.style.display     = 'none';
-  container.style.display  = 'none';
-  searchResult.style.display = 'none';
-
+async function loadFiltersForPiece(piece) {
+  const loadingMsg = document.getElementById(`filtersLoadingMsg-${piece}`);
+  const errMsg     = document.getElementById(`filtersLoadingErr-${piece}`);
+  const container  = document.getElementById(`filtersContainer-${piece}`);
   try {
-    if (!_cachedByType[piece]) {
-      const allSuits = await getAvailableSuits();
-      _cachedByType[piece] = allSuits.filter(s => s.suit_parts === PIECE_TYPES[piece]);
-    }
-    const suits = _cachedByType[piece];
+    // ✅ نجلب كل البدل — مش مقيّدين بنوع واحد
+    const suits = await fetchAllSuits();
+
     const unique = (key) => [...new Set(suits.map(s => s[key]).filter(Boolean))].sort();
     const colors = unique('color');
-    const sizes  = unique('size').sort((a,b) => Number(a)-Number(b) || a.localeCompare(b));
+    const sizes  = unique('size').sort((a,b) => Number(a) - Number(b) || a.localeCompare(b));
 
     function fillSelect(id, values) {
       const sel = document.getElementById(id);
       sel.innerHTML = '<option value="">الكل</option>' +
         values.map(v => `<option value="${v}">${v}</option>`).join('');
     }
-    fillSelect('ws-sColor', colors);
-    fillSelect('ws-sSize',  sizes);
+    fillSelect(`sColor-${piece}`, colors);
+    fillSelect(`sSize-${piece}`,  sizes);
 
     loadingMsg.style.display = 'none';
     container.style.display  = 'block';
-    document.getElementById('ws-countBadge').textContent =
+    document.getElementById(`countBadge-${piece}`).textContent =
       suits.length ? `(${suits.length} متاح)` : '(لا يوجد متاح)';
   } catch (err) {
     loadingMsg.style.display = 'none';
@@ -353,70 +342,32 @@ async function loadFiltersForActive() {
   }
 }
 
-function resetWorkspace() {
-  document.getElementById('ws-searchResults').style.display = 'none';
-  document.getElementById('ws-searchResultsBody').innerHTML  = '';
-  document.getElementById('ws-directCode').value             = '';
-  document.getElementById('ws-directCodeResult').innerHTML   = '';
-  document.getElementById('ws-filtersLoadingMsg').style.display = 'block';
-  document.getElementById('ws-filtersContainer').style.display  = 'none';
-  document.getElementById('ws-filtersLoadingErr').style.display  = 'none';
-}
-
-/* ── تبويبات workspace ── */
-function switchWorkspaceTab(tab) {
-  _wsTab = tab;
-  document.getElementById('tabwsbtn-search').classList.toggle('active', tab === 'search');
-  document.getElementById('tabwsbtn-code').classList.toggle('active',   tab === 'code');
-  document.getElementById('tabws-search').classList.toggle('active',    tab === 'search');
-  document.getElementById('tabws-code').classList.toggle('active',      tab === 'code');
-}
-
-/* ── عرض الكل ── */
-async function showAllPiecesWS() {
+async function showAllPieces(piece) {
   showLoading('جاري التحميل...');
   try {
-    if (!_cachedByType[_activePiece]) {
-      const allSuits = await getAvailableSuits();
-      _cachedByType[_activePiece] = allSuits.filter(s => s.suit_parts === PIECE_TYPES[_activePiece]);
-    }
+    const suits = await fetchAllSuits();
     hideLoading();
-    renderPieceTable(_cachedByType[_activePiece]);
-  } catch(err) { hideLoading(); showToast('فشل تحميل البدل: ' + err.message, 'danger'); }
+    renderPieceTable(piece, suits);
+  } catch(err) {
+    hideLoading();
+    showToast('فشل تحميل البدل: ' + err.message, 'danger');
+  }
 }
 
-/* ── بحث ── */
-async function searchPieceWS() {
-  const color = document.getElementById('ws-sColor').value;
-  const size  = document.getElementById('ws-sSize').value;
-  showLoading('جاري البحث...');
-  try {
-    if (!_cachedByType[_activePiece]) {
-      const allSuits = await getAvailableSuits();
-      _cachedByType[_activePiece] = allSuits.filter(s => s.suit_parts === PIECE_TYPES[_activePiece]);
-    }
-    let results = _cachedByType[_activePiece];
-    if (color) results = results.filter(s => s.color === color);
-    if (size)  results = results.filter(s => s.size  === size);
-    hideLoading();
-    renderPieceTable(results);
-  } catch(err) { hideLoading(); showToast('فشل تحميل البدل: ' + err.message, 'danger'); }
-}
-
-/* ── رسم الجدول ── */
-function renderPieceTable(results) {
-  const container = document.getElementById('ws-searchResults');
-  const tbody     = document.getElementById('ws-searchResultsBody');
+function renderPieceTable(piece, results) {
+  const container = document.getElementById(`searchResults-${piece}`);
+  const tbody     = document.getElementById(`searchResultsBody-${piece}`);
   if (!results.length) {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="padding:20px">لا توجد قطع مطابقة</td></tr>`;
   } else {
     tbody.innerHTML = results.map(s => `
-      <tr onclick="selectPieceFromTable('${s.suit_id}')" id="wsrow-${s.suit_id}" style="cursor:pointer">
-        <td><input type="radio" name="pick-ws" value="${s.suit_id}" onchange="selectPieceFromTable('${s.suit_id}')"></td>
+      <tr onclick="selectPieceFromTable('${piece}','${s.suit_id}')" id="row-${piece}-${s.suit_id}" style="cursor:pointer">
+        <td><input type="radio" name="pick-${piece}" value="${s.suit_id}" onchange="selectPieceFromTable('${piece}','${s.suit_id}')"></td>
         <td style="padding:6px">
           ${s.image_url
-            ? `<img src="${s.image_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:2px solid var(--accent);display:block;cursor:zoom-in" onclick="event.stopPropagation();openImgViewerSrc('${s.image_url}','')">`
-            : `<div style="width:48px;height:48px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px dashed var(--border)">👔</div>`}
+            ? `<img src="${s.image_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:2px solid var(--accent);display:block;cursor:zoom-in" onclick="event.stopPropagation();openImgViewerSrc('${s.image_url}','${s.suit_id}')" title="اضغط لتكبير الصورة">`
+            : `<div style="width:48px;height:48px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px dashed var(--border)">👔</div>`
+          }
         </td>
         <td><strong>${s.suit_id}</strong></td>
         <td>${s.suit_type}</td>
@@ -426,48 +377,75 @@ function renderPieceTable(results) {
     `).join('');
   }
   container.style.display = 'block';
+  clearPiece(piece);
 }
 
-function selectPieceFromTable(suit_id) {
-  const radio = document.querySelector(`input[name="pick-ws"][value="${suit_id}"]`);
+async function searchPiece(piece) {
+  const color = document.getElementById(`sColor-${piece}`).value;
+  const size  = document.getElementById(`sSize-${piece}`).value;
+
+  showLoading('جاري البحث...');
+  try {
+    // ✅ نبحث في كل البدل
+    let results = await fetchAllSuits();
+    if (color) results = results.filter(s => s.color === color);
+    if (size)  results = results.filter(s => s.size  === size);
+    hideLoading();
+    renderPieceTable(piece, results);
+  } catch (err) {
+    hideLoading();
+    showToast('فشل تحميل البدل: ' + err.message, 'danger');
+  }
+}
+
+function selectPieceFromTable(piece, suit_id) {
+  const radio = document.querySelector(`input[name="pick-${piece}"][value="${suit_id}"]`);
   if (radio) radio.checked = true;
-  document.querySelectorAll('#ws-searchResultsBody tr').forEach(tr => tr.classList.remove('selected'));
-  const row = document.getElementById('wsrow-' + suit_id);
+
+  document.querySelectorAll(`#searchResults-${piece} .radio-table tr`).forEach(tr => tr.classList.remove('selected'));
+  const row = document.getElementById(`row-${piece}-${suit_id}`);
   if (row) row.classList.add('selected');
 
   const normalizedId = String(suit_id).trim().toUpperCase();
-  if (_cachedByType[_activePiece]) {
-    const suit = _cachedByType[_activePiece].find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
-    if (suit) { setSelectedPiece(_activePiece, suit); return; }
+  if (_allSuitsCache) {
+    const suit = _allSuitsCache.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
+    if (suit) { setSelectedPiece(piece, suit); return; }
   }
-  getAvailableSuits().then(suits => {
+  fetchAllSuits().then(suits => {
     const suit = suits.find(s => String(s.suit_id).trim().toUpperCase() === normalizedId);
-    if (suit) setSelectedPiece(_activePiece, suit);
+    if (suit) setSelectedPiece(piece, suit);
   });
 }
 
-/* ── كود مباشر ── */
-async function checkDirectCodeWS() {
-  const code      = document.getElementById('ws-directCode').value.trim().toUpperCase();
-  const resultDiv = document.getElementById('ws-directCodeResult');
-  if (!code) { resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ يرجى إدخال الكود</div>'; return; }
+async function checkDirectCode(piece) {
+  const code      = document.getElementById(`directCode-${piece}`).value.trim().toUpperCase();
+  const resultDiv = document.getElementById(`directCodeResult-${piece}`);
+
+  if (!code) {
+    resultDiv.innerHTML = '<div class="alert-banner alert-red">⚠️ يرجى إدخال الكود</div>';
+    return;
+  }
 
   showLoading('جاري التحقق...');
   try {
     const suit = await getSuitById(code);
     hideLoading();
+
     if (!suit) {
       resultDiv.innerHTML = '<div class="alert-banner alert-red">❌ الكود غير موجود في النظام</div>';
-      clearPiece(_activePiece);
-    } else if (suit.suit_parts !== PIECE_TYPES[_activePiece]) {
-      resultDiv.innerHTML = `<div class="alert-banner alert-red">⚠️ هذه القطعة (${suit.suit_parts}) لا تطابق ${PIECE_TYPES[_activePiece]}</div>`;
-      clearPiece(_activePiece);
+      clearPiece(piece);
     } else if (suit.status !== 'متاحة') {
+      // ✅ فقط نتحقق من الإتاحة — لا نرفض بسبب نوع القطعة
       resultDiv.innerHTML = `<div class="alert-banner alert-red">🔒 الكود <strong>${code}</strong> مؤجَّر حالياً — غير متاح</div>`;
-      clearPiece(_activePiece);
+      clearPiece(piece);
     } else {
-      resultDiv.innerHTML = `<div class="alert-banner alert-success">✅ تم العثور على القطعة وهي متاحة</div>`;
-      setSelectedPiece(_activePiece, suit);
+      // ملاحظة صغيرة لو النوع مختلف (للمعلومية فقط، لا للرفض)
+      const pieceLabel = PIECE_TYPES[piece];
+      const typeNote   = suit.suit_parts && suit.suit_parts !== pieceLabel
+        ? ` <span style="font-size:11px;color:var(--gray-500)">(النوع الأصلي: ${suit.suit_parts})</span>`
+        : '';
+      resultDiv.innerHTML = `<div class="alert-banner alert-success">✅ متاحة — سيُسجَّل كـ <strong>${pieceLabel}</strong>${typeNote}</div>`;
+      setSelectedPiece(piece, suit);
     }
   } catch (err) {
     hideLoading();
@@ -475,62 +453,53 @@ async function checkDirectCodeWS() {
   }
 }
 
-/* ── تعيين القطعة المختارة ── */
 function setSelectedPiece(piece, suit) {
   selectedPieces[piece] = suit;
+  document.getElementById(`selectedText-${piece}`).textContent =
+    `${suit.suit_id} | ${suit.suit_type} | ${suit.color} | مقاس ${suit.size}`;
+  document.getElementById(`selectedBox-${piece}`).classList.add('show');
 
-  // تحديث الزر
-  const statusEl = document.getElementById('piecestatus-' + piece);
-  statusEl.textContent  = suit.suit_id;
-  statusEl.className    = 'piece-btn-status selected-tag';
-
-  // تحديث الملخص
-  updateSummary();
+  const imgWrap = document.getElementById(`selectedImgWrap-${piece}`);
+  const imgEl   = document.getElementById(`selectedImg-${piece}`);
+  if (suit.image_url) {
+    imgEl.src = suit.image_url;
+    imgWrap.style.display = 'block';
+  } else {
+    imgWrap.style.display = 'none';
+  }
 }
 
 function clearPiece(piece) {
   selectedPieces[piece] = null;
-  const statusEl = document.getElementById('piecestatus-' + piece);
-  statusEl.textContent = piece === 'vest' ? 'اختياري' : '—';
-  statusEl.className   = 'piece-btn-status' + (piece === 'vest' ? ' optional-tag' : '');
-  updateSummary();
+  document.getElementById(`selectedBox-${piece}`).classList.remove('show');
 }
 
-/* ── ملخص القطع ── */
-function updateSummary() {
-  const grid    = document.getElementById('pieces-summary-grid');
-  const wrapper = document.getElementById('pieces-summary');
-  const pieces  = Object.entries(selectedPieces).filter(([,v]) => v);
-
-  if (!pieces.length) { wrapper.style.display = 'none'; return; }
-  wrapper.style.display = 'block';
-
-  const icons = { jacket: '🧥', pants: '👖', vest: '🦺' };
-  grid.innerHTML = pieces.map(([key, suit]) => `
-    <div class="summary-piece-card">
-      ${suit.image_url
-        ? `<img src="${suit.image_url}" onclick="openImgViewerSrc('${suit.image_url}','')" style="width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:zoom-in;border:2px solid var(--accent)">`
-        : `<div style="width:52px;height:52px;border-radius:8px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:26px">${icons[key]}</div>`}
-      <div class="summary-piece-info">
-        <div class="summary-piece-name">${PIECE_TYPES[key]}</div>
-        <div class="summary-piece-detail">${suit.suit_id} · ${suit.color} · ${suit.size}</div>
-      </div>
-      <button onclick="clearPiece('${key}')" class="summary-piece-remove" title="إلغاء">✕</button>
-    </div>
-  `).join('');
+function switchTab(tab, piece) {
+  const tabBtns = document.querySelectorAll(`#tab-search-${piece}`).length
+    ? document.getElementById(`tab-search-${piece}`).closest('.tabs-container').querySelectorAll('.tab-btn')
+    : null;
+  if (tabBtns) {
+    tabBtns.forEach((b,i) => {
+      b.classList.toggle('active', (i === 0 && tab === 'search') || (i === 1 && tab === 'code'));
+    });
+  }
+  document.getElementById(`tab-search-${piece}`).classList.toggle('active', tab === 'search');
+  document.getElementById(`tab-code-${piece}`).classList.toggle('active',   tab === 'code');
+  clearPiece(piece);
 }
-
-/* ── الحقول القديمة التي تحتاجها باقي الكود (فارغة الآن) ── */
-function switchTab() {}
 
 function openImgViewerFromPiece(piece) {
-  const suit = selectedPieces[piece];
-  if (suit && suit.image_url) openImgViewerSrc(suit.image_url, piece);
+  const src = document.getElementById(`selectedImg-${piece}`).src;
+  openImgViewerSrc(src, piece);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!Auth.requireEmployee()) return;
-  activatePiece('jacket');
+
+  loadFiltersForPiece('jacket');
+  loadFiltersForPiece('pants');
+  loadFiltersForPiece('vest');
+
   const todayStr = today();
   document.getElementById('checkoutDate').value = todayStr;
   document.getElementById('checkoutDate').min   = todayStr;
@@ -538,6 +507,135 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('expectedReturn').min = document.getElementById('checkoutDate').value;
   });
 });
+
+async function confirmRental() {
+  const jacket = selectedPieces.jacket;
+  const pants  = selectedPieces.pants;
+  const vest   = selectedPieces.vest;
+
+  if (!jacket && !pants && !vest) {
+    showToast('يرجى اختيار قطعة واحدة على الأقل (جاكيت أو بنطلون)', 'warning');
+    return;
+  }
+
+  let valid = true;
+  const tenantName     = document.getElementById('tenantName').value.trim();
+  const tenantPhone    = document.getElementById('tenantPhone').value.trim();
+  const tenantAddress  = document.getElementById('tenantAddress').value.trim();
+  const nationalId     = document.getElementById('nationalId').value.trim();
+  const checkoutDate   = document.getElementById('checkoutDate').value;
+  const expectedReturn = document.getElementById('expectedReturn').value;
+  const rentalPrice    = document.getElementById('rentalPrice').value;
+  const depositAmount  = document.getElementById('depositAmount').value;
+  const paymentMethod  = document.getElementById('paymentMethod').value;
+  const notes          = document.getElementById('notes').value.trim();
+
+  valid = validate('tenantName',    !!tenantName,                                  'errTenantName')    && valid;
+  valid = validate('tenantPhone',   /^(010|011|012|015)\d{8}$/.test(tenantPhone),  'errTenantPhone')   && valid;
+  valid = validate('tenantAddress', !!tenantAddress,                               'errTenantAddress') && valid;
+  valid = validate('nationalId',    /^\d{14}$/.test(nationalId),                   'errNationalId')    && valid;
+  valid = validate('checkoutDate',  !!checkoutDate,                                'errCheckout')      && valid;
+  valid = validate('expectedReturn',!!expectedReturn && expectedReturn >= checkoutDate,'errReturn')     && valid;
+  valid = validate('rentalPrice',   !!rentalPrice && Number(rentalPrice) >= 0,      'errPrice')        && valid;
+  valid = validate('depositAmount', !!depositAmount && Number(depositAmount) >= 0,  'errDeposit')      && valid;
+  valid = validate('paymentMethod', !!paymentMethod,                               'errPayment')       && valid;
+
+  if (!valid) {
+    document.getElementById('formError').textContent = '⚠️ يرجى تصحيح الأخطاء أعلاه قبل المتابعة';
+    document.getElementById('formError').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  document.getElementById('formError').style.display = 'none';
+
+  const btn = document.getElementById('confirmBtn');
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> جاري الحفظ...';
+
+  try {
+    const user   = Auth.getCurrentUser();
+    const pieces = [jacket, pants, vest].filter(Boolean);
+    const group_rental_id = await generateRentalId();
+    let allSuccess = true;
+
+    for (let i = 0; i < pieces.length; i++) {
+      const piece     = pieces[i];
+      const rental_id = i === 0 ? group_rental_id : group_rental_id + '-' + (i + 1);
+
+      const rentalData = {
+        rental_id,
+        suit_id:          piece.suit_id,
+        suit_type:        piece.suit_type,
+        suit_parts:       piece.suit_parts,
+        color:            piece.color,
+        size:             piece.size,
+        tenant_name:      tenantName,
+        tenant_phone:     tenantPhone,
+        tenant_address:   tenantAddress,
+        national_id:      nationalId,
+        national_id_img:  '',
+        checkout_date:    checkoutDate,
+        expected_return:  expectedReturn,
+        actual_return:    '',
+        rental_price:     i === 0 ? rentalPrice : '0',
+        payment_method:   paymentMethod,
+        deposit_amount:   i === 0 ? depositAmount : '0',
+        deposit_returned: 'لا',
+        rented_by:        user.username,
+        returned_by:      '',
+        status:           'مؤجَّرة',
+        notes:            i === 0 ? notes : `مجموعة مع ${group_rental_id}`
+      };
+
+      const result = await addRental(rentalData);
+      if (!result.success) allSuccess = false;
+    }
+
+    if (allSuccess) {
+      const pieceNames = pieces.map(p => `${p.suit_parts} (${p.suit_id})`).join(' + ');
+      showToast(`✅ تم تسجيل التأجير بنجاح — ${pieceNames} — كود: ${group_rental_id}`, 'success', 6000);
+      resetForm();
+    } else {
+      showToast('حدث خطأ أثناء حفظ بعض القطع، تحقق من السجل', 'danger');
+    }
+  } catch (err) {
+    showToast('فشل الاتصال بقاعدة البيانات، تأكد من الإعدادات', 'danger');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '✅ تأكيد التأجير';
+  }
+}
+
+function validate(fieldId, condition, errId) {
+  const field = document.getElementById(fieldId);
+  const err   = document.getElementById(errId);
+  if (!condition) { field.classList.add('error');    err.classList.add('show');    return false; }
+  else            { field.classList.remove('error'); err.classList.remove('show'); return true;  }
+}
+
+function resetForm() {
+  selectedPieces = { jacket: null, pants: null, vest: null };
+  _allSuitsCache = null;
+  ['jacket','pants','vest'].forEach(p => {
+    clearPiece(p);
+    const dc = document.getElementById(`directCode-${p}`);
+    if (dc) dc.value = '';
+    const dr = document.getElementById(`directCodeResult-${p}`);
+    if (dr) dr.innerHTML = '';
+    const sr = document.getElementById(`searchResults-${p}`);
+    if (sr) sr.style.display = 'none';
+  });
+  ['tenantName','tenantPhone','tenantAddress','nationalId','rentalPrice','depositAmount','notes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('paymentMethod').value    = '';
+  document.getElementById('checkoutDate').value     = today();
+  document.getElementById('expectedReturn').value   = '';
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.form-control').forEach(e => e.classList.remove('error'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function openImgViewerSrc(src, suitId) {
   document.getElementById('imgViewerImg').src = src;
   document.getElementById('imgViewerModal').style.display = 'flex';
